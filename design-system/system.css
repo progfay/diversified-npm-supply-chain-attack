@@ -1,0 +1,82 @@
+/* ==========================================================================
+   slidex — system.css
+   デザイントークン(色・タイポグラフィ・余白)のみを定義する。
+   レイアウト・装飾・基本要素のスタイリングは各スライドの <head><style> 側で
+   組む(このファイルはトークンの供給元であり、見た目そのものは持たない)。
+
+   全宣言を @layer system に入れる。スライド固有の <style> は無レイヤーの
+   まま書けば、CSS Cascade Layers の規則(無レイヤーの通常宣言は詳細度に
+   関係なくレイヤー内の宣言に必ず勝つ)により、要素セレクタ1個でもここの
+   スタイルを上書きできる。逆にスライド側で @layer を使うと今度はそちらが
+   埋没するので、スライド固有の <style> の中身は絶対に @layer で囲まない。
+
+   Engine contract: MUST stay dependency-free (no @import/@font-face/@media),
+   MUST scope every selector under .slide, MUST NOT redefine canvas size,
+   box-sizing, overflow or aside.notes (engine/base.css owns those).
+   See design-system/DESIGN.md + design-system/PRINCIPLE.md for the full spec.
+   ========================================================================== */
+
+@layer system {
+  .slide {
+    /* ---- 3. Color tokens (contract — names are load-bearing, keep them) ---- */
+    --color-bg: #10141F;
+    --color-ink: #E8EDF6;
+    --color-muted: #8C96AB;
+    --color-accent: #5CCFE6;
+    --color-code-bg: #171D2B;
+    --color-code-ink: #DDE4F0;
+
+    /* additional tokens */
+    --color-surface: #171D2B;
+    --color-line: #2A3245;
+    --color-success: #7DD8A0;
+    --color-warning: #F0C674;
+    --color-danger: #F2708A;
+
+    /* ---- 4. Typography tokens (contract) ---- */
+    --font-display: 'Avenir Next', 'Helvetica Neue', Arial, 'Hiragino Kaku Gothic ProN', 'Hiragino Sans', 'Noto Sans JP', sans-serif;
+    --font-body: 'Avenir Next', 'Helvetica Neue', Arial, 'Hiragino Kaku Gothic ProN', 'Hiragino Sans', 'Noto Sans JP', sans-serif;
+    --font-mono: ui-monospace, 'SF Mono', Menlo, monospace;
+
+    /* type scale, in real px at 1280×720 */
+    --text-title: 72px;
+    --text-h1: 52px;
+    --text-h2: 32px;
+    --text-body: 24px;
+    --text-muted: 20px;
+    --text-code: 19px;
+
+    /* ---- 5. Spacing (contract) ---- */
+    --space-page: 80px;
+  }
+
+  /* ---- 6. 箇条書き(契約 — 手順3のHTML書き起こしで直接使うため維持) ---- */
+  .slide ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  .slide ul > li {
+    font-size: var(--text-body);
+    line-height: 1.7;
+    padding-left: 28px;
+    position: relative;
+    text-wrap: pretty;
+  }
+
+  .slide ul > li::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0.5lh; /* 複数行でも1行目の縦中央に揃える */
+    transform: translateY(-50%);
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: var(--color-accent);
+  }
+}

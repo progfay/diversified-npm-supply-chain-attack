@@ -1,0 +1,193 @@
+/* シェル(ビューア)側のスタイル。スライドの中身には一切干渉しない */
+
+* { box-sizing: border-box; }
+
+html, body {
+  margin: 0;
+  height: 100%;
+  overflow: hidden;
+  background: #16181d;
+}
+
+#stage {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+
+/* --- 通常表示: 現在のスライドだけ中央に scale して表示 --- */
+
+.slide-host {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 1280px;
+  height: 720px;
+  /* 1280x720 をビューポートにフィット(typed arithmetic: 長さ÷長さ=数値) */
+  transform: translate(-50%, -50%)
+             scale(min(calc(100dvi / 1280px), calc(100dvb / 720px)));
+  transform-origin: center;
+  display: none;
+  background: #fff;
+  box-shadow: 0 8px 40px rgb(0 0 0 / 0.45);
+}
+
+.slide-host[data-active] { display: block; }
+
+/* --- overview モード: 全スライドをグリッドで一覧 --- */
+
+body.overview #stage {
+  overflow-y: auto;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 24px;
+  padding: 24px;
+  align-content: start;
+}
+
+body.overview .slide-host {
+  display: block;
+  position: relative;
+  top: auto; left: auto;
+  transform: none;
+  width: 100%;
+  height: auto;
+  aspect-ratio: 16 / 9;
+  cursor: pointer;
+  overflow: hidden;
+  outline: 2px solid transparent;
+  border-radius: 4px;
+}
+
+body.overview .slide-host[data-active] { outline-color: #5CCFE6; }
+
+/* --- chrome: プログレスバーとページ番号 --- */
+
+#chrome {
+  position: fixed;
+  inset: auto 0 0 0;
+  pointer-events: none;
+  font: 12px/1 ui-monospace, monospace;
+  color: rgb(255 255 255 / 0.55);
+}
+
+#progress-track {
+  height: 3px;
+  background: rgb(255 255 255 / 0.12);
+}
+
+#progress {
+  height: 100%;
+  background: #5CCFE6;
+  transform-origin: left;
+  transform: scaleX(0);
+  transition: transform 0.25s ease;
+}
+
+#page-counter {
+  position: absolute;
+  right: 12px;
+  bottom: 12px;
+}
+
+body.overview #chrome { display: none; }
+
+/* --- View Transitions: ページ送りの遷移演出 --- *
+ * エンジンが document.startViewTransition() でページ切り替えを包む。
+ * ::view-transition-* 疑似要素はドキュメントスコープにしか存在しないため、
+ * 演出の定義はデザインシステム(shadow スコープ)ではなくここに置く。
+ * 未対応ブラウザではこのブロックは丸ごと無視され、即時切り替えになる。
+ */
+
+/* 表示中のスライドだけに名前を付け、old/new のスナップショット対を作る。
+   overview からの選択時は同名同士がモーフする(グリッドのセル → 全画面) */
+.slide-host[data-active] { view-transition-name: current-slide; }
+
+/* chrome も独立したスナップショットにする。名前を付けないと root スナップ
+   ショットに含まれ、上に重なる current-slide の遷移レイヤーに隠されて
+   しまう。#chrome は #stage より後にあるため、このグループはスライドの
+   グループより上に描画され、遷移中もプログレスバーが見え続ける */
+#chrome { view-transition-name: chrome; }
+
+::view-transition-old(current-slide),
+::view-transition-new(current-slide) {
+  animation-duration: 0.22s;
+  animation-timing-function: cubic-bezier(0.2, 0, 0, 1);
+}
+
+/* 方向付き(エンジンが types: [forward|backward] を渡す)。
+   :active-view-transition-type() 未対応ならクロスフェードのまま */
+html:active-view-transition-type(forward)::view-transition-old(current-slide) {
+  animation-name: vt-out-to-left;
+}
+html:active-view-transition-type(forward)::view-transition-new(current-slide) {
+  animation-name: vt-in-from-right;
+}
+html:active-view-transition-type(backward)::view-transition-old(current-slide) {
+  animation-name: vt-out-to-right;
+}
+html:active-view-transition-type(backward)::view-transition-new(current-slide) {
+  animation-name: vt-in-from-left;
+}
+
+@keyframes vt-out-to-left {
+  to { opacity: 0; transform: translateX(-48px); }
+}
+@keyframes vt-in-from-right {
+  from { opacity: 0; transform: translateX(48px); }
+}
+@keyframes vt-out-to-right {
+  to { opacity: 0; transform: translateX(48px); }
+}
+@keyframes vt-in-from-left {
+  from { opacity: 0; transform: translateX(-48px); }
+}
+
+/* --- 印刷 / PDF エクスポート --- *
+ * ⌘P / Ctrl+P(エンジンが全スライドのロードを待ってから window.print())で
+ * 1スライド = 1ページ の PDF になる。@page をキャンバスと同寸にして
+ * 拡縮なし・余白なしの等倍で刷る。overview モードで印刷しても同じ出力に
+ * なるよう、画面用レイアウトを !important で打ち消す。
+ */
+
+@page {
+  size: 1280px 720px;
+  margin: 0;
+}
+
+@media print {
+  html, body {
+    display: block !important;
+    overflow: visible !important;
+    height: auto !important;
+    padding: 0 !important;
+    background: none !important;
+  }
+
+  #chrome { display: none !important; }
+
+  #stage {
+    display: block !important;
+    position: static !important;
+    height: auto !important;
+    padding: 0 !important;
+  }
+
+  .slide-host {
+    display: block !important;
+    position: static !important;
+    width: 1280px !important;
+    height: 720px !important;
+    aspect-ratio: auto !important;
+    transform: none !important;
+    box-shadow: none !important;
+    border-radius: 0 !important;
+    outline: none !important;
+  }
+
+  .slide-host:not(:last-child) { break-after: page; }
+
+  /* 背景色・アクセント色を「背景のグラフィック」設定に関わらず刷る
+     (継承プロパティなので shadow 内のスライドにも効く) */
+  :root { print-color-adjust: exact; }
+}

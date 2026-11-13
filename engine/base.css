@@ -1,0 +1,33 @@
+/*
+ * 全スライドの shadow root に共有適用される基本レイヤー。
+ * スライドは常に 1280x720 の固定キャンバスとして書けばよい。
+ */
+
+:host {
+  display: block;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  /* shadow 内から cqw で host 幅を参照できるようにする(下記 scale 用) */
+  container-type: inline-size;
+}
+
+.slide {
+  width: 1280px;
+  height: 720px;
+  transform-origin: top left;
+  /* host 幅に合わせて縮小(通常表示は host が 1280px なので等倍、
+     overview のグリッドセルでは縮む)。長さ÷長さ=数値の typed arithmetic */
+  transform: scale(calc(100cqw / 1280px));
+  position: relative;
+  overflow: hidden;
+}
+
+/* .slide 自身も border-box にする(padding を 1280x720 の内側に収める) */
+.slide, .slide * { box-sizing: border-box; }
+
+/* overview 中はスライド内のインタラクティブ要素を無効化(クリックは選択に使う) */
+:host([data-overview]) .slide { pointer-events: none; }
+
+/* 発表者ノート。スライドのキャンバス上には出さない(note.html が別途表示する) */
+aside.notes { display: none; }

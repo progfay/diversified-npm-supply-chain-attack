@@ -1,0 +1,120 @@
+# slidex
+
+Claude Code でスライドを高速に作るための**テンプレートリポジトリ**。
+「エンジン」「デザインシステム」「コンテンツ」を分離した3層構成で、
+**1リポジトリ = 1デッキ**。デッキごとにこのテンプレートから新しいリポジトリを作る。
+
+## 新しいデッキを作る
+
+1. GitHub で **Use this template → Create a new repository** からデッキ名のリポジトリを作る
+2. clone して Claude Code に発表内容を伝える。ブレインダンプからスライド生成まで
+   Claude Code が行う(手順と生成規約は [CLAUDE.md](./CLAUDE.md) に記載)
+3. 公開する場合は **Settings → Pages → Source を「Deploy from a branch」
+   (main / root)** に設定する。以降は main への push で自動デプロイされる
+   (テンプレートから作成したリポジトリでも Pages の設定は引き継がれないため、
+   デッキごとにこの設定が必要)
+
+## 使い方
+
+### プレビュー
+
+```sh
+python3 -m http.server 8000
+```
+
+http://localhost:8000/ を開く(ソースと配信物が同じ構造なのでビルド不要)。
+
+| 操作 | 動作 |
+|---|---|
+| → ↓ Space / 画面右端 1/4 クリック | 次へ |
+| ← ↑ / 画面左端 1/4 クリック | 前へ |
+| o | 一覧(オーバービュー) |
+| ⌘P / Ctrl+P | PDF に出力(印刷ダイアログ) |
+| `?page=3` | 3ページ目へ直接ジャンプ(URL共有可) |
+
+ページ位置は実URL(`?page=N`)に同期される。
+
+### ノート
+
+`note.html` を開くと、各スライドの発表者ノート(`<aside class="notes">`)を
+ページ順に縦スクロールで一覧できる。スマホでノートだけ読み返す用途で、
+上映(`index.html`)とは同期しない独立したページ。
+
+### PDF に出力
+
+ビューアで **⌘P / Ctrl+P** を押すと、全スライドのロードを待ってから印刷ダイアログが
+開く。送信先を「PDF に保存」にすれば、1スライド = 1ページ・キャンバスと同寸
+(1280x720)の PDF がそのまま得られる。用紙サイズや余白の手動設定は不要
+(ページ側の `@page` 指定が使われる)。ローカルプレビューでも公開済みの
+GitHub Pages でも同じ手順で出力できる。
+
+### スライドを作る
+
+`slides/` にスライドを足し、`manifest.json` の `slides` 配列に列挙する。
+詳細な規約は [CLAUDE.md](./CLAUDE.md) を参照(Claude Code はこれを読んで生成する)。
+
+### GitHub Pages に公開
+
+ビルドはない。Settings → Pages で Source を「Deploy from a branch」(main / root)
+に設定すると、main への push でリポジトリ root がそのまま配信される(ルートの
+`.nojekyll` で Jekyll の加工も入らない)。**URL 直下でそのまま上映**が始まり、
+各スライドは `slides/NN-slug.html` で単体閲覧もできる。
+
+リポジトリの全ファイル(`README.md` や `braindump.md` などのソースを含む)が
+そのまま配信される前提の運用なので、public リポジトリで使うこと。
+
+### テンプレートの更新を取り込む
+
+デッキリポジトリは作成時点のテンプレートのスナップショットで、テンプレート側の
+改善は自動では反映されない。取り込みたくなったら:
+
+```sh
+git remote add template https://github.com/progfay/slidex.git
+git fetch template
+git checkout template/main -- engine index.html note.html CLAUDE.md
+```
+
+デッキ側で手を入れていなければ `design-system` もパスに足してよい
+(`manifest.json` と `slides/` はデッキ固有なので含めないこと)。
+
+## 構成
+
+```
+<デッキ名>/
+├── index.html        # ビューアの入口(開くと上映が始まる)
+├── note.html         # 発表者ノートの一覧(縦スクロール、スマホ向け)
+├── manifest.json     # デッキ定義(タイトル・スライドの並び)← デッキごとに編集
+├── slides/           # 1スライド = 1HTML(NN-slug.html)← デッキごとに編集
+├── assets/           # 画像などのアセット + favicon ← デッキごとに編集
+├── engine/           # ビューア: ページ送り・スケーリング・Shadow DOM 注入
+│   ├── engine.js     #   本体(依存ゼロ・ESM)
+│   ├── shell.css     #   シェルUI(ステージ・プログレスバー)
+│   ├── base.css      #   全スライド共通の基本レイヤー(1280x720 キャンバス)
+│   ├── note.js       #   note.html 用(ノート一覧の描画)
+│   └── note.css      #   note.html 用のスタイル
+├── design-system/
+│   └── system.css    # トークン + レイアウト
+├── .nojekyll         # Pages に root をそのまま配信させる(Jekyll 加工の無効化)
+└── CLAUDE.md         # Claude Code 向けの生成規約
+```
+
+デッキとして編集するのは `manifest.json` `slides/` `assets/` だけ。それ以外は
+プラットフォーム部分で、テンプレートから複製されたまま使う。
+
+## アーキテクチャ上の要点
+
+- **各スライドは Shadow DOM に隔離**。スライド間の CSS 衝突は構造的に起きない
+- **デザインシステムは Constructable Stylesheet を全 shadow root で共有**
+  (`adoptedStyleSheets`)。差し替えると全スライドに即反映
+- **スライドは単体でも開ける完全な HTML**。シェル経由では `<link>` を捨てて
+  共有シートに置き換える二重動作。相対パスの `src` / `poster` は取り込み時に
+  スライドファイル基準へ解決されるので、単体表示と同じ書き方で動く
+- キャンバスは 1280x720 固定。エンジンが `transform: scale()` でフィットさせる
+
+## 動作要件
+
+最新の Chromium 系ブラウザ(Chrome / Edge)。Navigation API・Sanitizer API・
+Constructable Stylesheets・View Transitions(types 付き)を fallback なしで使用する。
+
+`note.html`(発表者ノート一覧)のみ iOS Safari など Sanitizer API 非対応環境も
+フォールバックで動作する(スマホから読み返す用途のため)。
