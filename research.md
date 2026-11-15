@@ -49,6 +49,29 @@ braindump.md の主張・事例の裏取り結果。出典つき。
 - InfoQ: https://www.infoq.com/news/2026/08/npm-12-released/
 - npm/cli issue: https://github.com/npm/cli/issues/9424
 
+### 一次情報の確認: Phantom Gyp と `--ignore-scripts`(2026-11-15、原文を直接読んだ)
+
+- ✅ **命名は StepSecurity**。原文に「a technique we are calling "Phantom Gyp"」とある(JFrog 命名説は二次情報の誤りの可能性が高い。JFrog の原文は見つからなかった)。キャンペーン名 Miasma も StepSecurity が追跡している呼称
+- ✅ 2026-06-03。57 パッケージ・286 超のバージョン。「2時間未満のローリングキャンペーン」(StepSecurity)
+- ✅ 原文の要点(StepSecurity):
+  - 「preinstall / postinstall など、セキュリティツールが通常監視するライフサイクルスクリプトの代わりに、157バイトの `binding.gyp` を悪用」
+  - 「**ほとんどの install-script セキュリティチェックを完全にバイパス**する」(= `scripts` フィールドを見るチェックのこと)
+  - `package.json` に install スクリプトの宣言は一切ない。npm は `binding.gyp` を見つけると自動で `node-gyp rebuild` を実行する(ネイティブアドオン向けの仕様)
+  - 仕組みは gyp のコマンド置換構文 `<!(...)`。`sources` に `"<!(node index.js > /dev/null 2>&1 && echo stub.c)"` を置き、ペイロードを実行する
+- ✅ **`--ignore-scripts` の効果(Snyk の原文)**: 「`--ignore-scripts` は `binding.gyp` を持つパッケージに対する npm の暗黙の node-gyp rebuild フックをブロックする」。ただし「唯一の防御と見なすべきではない」(悪意あるパッケージ自体は取得・展開され得る、`--ignore-scripts` なしの後続の `npm rebuild` や他のツールでビルドされ得る、他のパッケージマネージャーでは挙動が違い得る)
+  - → **手元検証(npm 10.9.9)と一致**
+- ⚠️ StepSecurity の対策欄の書き方: 「`npm install --ignore-scripts` は postinstall フックをブロックし、**自動 node-gyp ビルドをブロックすることで** binding.gyp 経路が閉じる」。**2つを別の対策のように読める書き方**で、`--ignore-scripts` 単体で gyp も止まるとは明言していない。これが「ignore-scripts では gyp が止まらない」という印象の出所になり得る(推測)
+- ✅ ワームは盗んだ npm トークンでメンテナの全パッケージを列挙→ `binding.gyp` と `index.js` を注入→再公開。**Sigstore の Provenance 証明も偽造して**再感染パッケージが正規に署名されたように見せる(Snyk)。Snyk は TanStack の事件を「有効な SLSA Provenance 付きの悪意あるパッケージの最初の文書化された例」としている
+- ✅ RubyGems でも同種(`extconf.rb`)。GitHub リポジトリへの汚染として `.claude/` などの AI エージェント / エディタのフックも仕込む(Snyk)
+- ✅ 窃取情報の持ち出し先は GitHub(`github.com` / `api.github.com` への通信は CI では遮断されにくいため)
+
+結論: **事実として正確なのは「`scripts` を見る検知・チェックは素通りされた。`--ignore-scripts` を入れていれば暗黙の gyp ビルドも止まる(npm)」。**
+「`ignore-scripts` では gyp がブロックされない」とは言えない。
+
+出典(一次):
+- StepSecurity: https://www.stepsecurity.io/blog/binding-gyp-npm-supply-chain-attack-spreads-like-worm
+- Snyk: https://snyk.io/blog/node-gyp-supply-chain-compromise-self-propagating-npm-worm-binding-gyp
+
 ### 手元検証: `--ignore-scripts` は暗黙の gyp ビルドを止めるか(2026-11-15)
 
 `package.json` に scripts なし + `binding.gyp` のみのパッケージ(gyp の `<!(...)` コマンド展開でマーカーファイルを作る)を tarball でインストールして確認した。
