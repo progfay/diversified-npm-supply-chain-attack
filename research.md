@@ -49,6 +49,21 @@ braindump.md の主張・事例の裏取り結果。出典つき。
 - InfoQ: https://www.infoq.com/news/2026/08/npm-12-released/
 - npm/cli issue: https://github.com/npm/cli/issues/9424
 
+### 手元検証: `--ignore-scripts` は暗黙の gyp ビルドを止めるか(2026-11-15)
+
+`package.json` に scripts なし + `binding.gyp` のみのパッケージ(gyp の `<!(...)` コマンド展開でマーカーファイルを作る)を tarball でインストールして確認した。
+
+| 環境 | 結果 |
+|---|---|
+| npm 10.9.9(デフォルト) | **実行された**(マーカーができた) |
+| npm 10.9.9 + `--ignore-scripts` | **実行されなかった** |
+| pnpm 10.28.0(デフォルト) | **実行されなかった**(ビルドスクリプトの承認待ちの警告) |
+
+- つまり少なくとも npm 10.9.9 / pnpm 10.28.0 では、`--ignore-scripts` やビルド承認制は暗黙の gyp ビルドも止める
+- 「`ignore-scripts` では gyp がブロックされない」は、**この検証では再現しなかった**
+- Phantom Gyp が突破したのは、ブロックを入れていない環境(特に CI)と、`scripts` フィールドだけを見て判定するツール・運用と考える方が整合的。**どちらなのかは一次情報で確認が必要**
+- 検証の限界: 単純な1パターンのみ。yarn / bun / 他バージョンは未確認
+
 ## AsyncAPI(Provenance 付きで侵害)
 
 - ✅ 2026-07-14。@asyncapi の4パッケージ・5バージョン(generator 3.3.1、generator-helpers 1.1.1、generator-components 0.7.1、specs 6.11.2-alpha.1 / 6.11.2)
