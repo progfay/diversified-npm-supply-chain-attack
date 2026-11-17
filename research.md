@@ -98,12 +98,19 @@ scripts なし + `binding.gyp` のみのパッケージ(gyp の `<!(...)` でマ
 - 🟢 原文: 「パッケージは正当な SLSA Provenance 証明を持つ。証明するのはプロジェクトの正規ワークフローが作ったことだけで、**それを起動したコミットが正当だったことではない**。Provenance は侵害された push 認証情報からは守らない」
 - 🟢 ドロッパーは**ライブラリの読み込み時(`require()`)に実行**され、インストール時ではない
 - 🟢 同日 11:18 UTC までに5バージョンすべてが unpublish。「新規インストールは安全、露出期間中の既存インストールと lockfile は安全ではない」
-- ⚠️ Aikido は「npm トークンが盗まれた」としている(二次情報経由)。StepSecurity と食い違うので、トークン窃取の有無は語らない
-- ❌ Microsoft の原文はアクセス拒否(403)で読めなかった
+- 🟢 **Microsoft の原文(WebFetch で取得)で補強**:
+  - 影響は「4パッケージ名・5バージョン」: @asyncapi/specs 6.11.2-alpha.1 / 6.11.2、@asyncapi/generator 3.3.1、@asyncapi/generator-components 0.7.1、@asyncapi/generator-helpers 1.1.1。**安全版は specs 6.11.1 以前**(→ StepSecurity の表の 6.11.1 は直前の正規版。⚠️ は解消)
+  - @asyncapi/specs は多数の AsyncAPI ツールの**推移的依存**なので、直接使っていなくても影響が及んだ
+  - 発端は GitHub Actions の **「pwn request」**: PR #2155 が `pull_request_target` のワークフローで信頼できない head commit をチェックアウトさせ、**asyncapi-bot の PAT が露出**した。ただし「認証情報がどう取得されたかは確定していない」と明記
+  - その後 asyncapi-bot として自動公開ブランチに push し、正規の release ワークフローに公開させた。「npm を侵害したり、別の公開経路を作ったりする必要はなかった」
+  - 「5バージョンすべてが GitHub OIDC による npm の trusted publishing で公開され、**有効な provenance 証明を持っていた**」「証明は、パッケージを作った正規のリポジトリ・コミット・ワークフローを**正確に**示していた。**起動したコミットが無許可だったにもかかわらず**」
+  - 「よくある postinstall フック型と違い、このキャンペーンは**モジュール読み込み(import / require)時**に実行される」「影響を受けたパッケージはどれも preinstall / install / postinstall を宣言していなかった」「**緩和策として `npm install --ignore-scripts` に頼らないこと**」
+  - 推奨策には「npm CLI 11.10.0 以上への更新、または `min-release-age` の利用」が含まれる。公開する側への推奨として、トークンのスコープ、ワークフローの承認、protected environment、公開の異常検知の見直し
+- ⚠️ Aikido は「npm トークンが盗まれた」としている(二次情報経由)。StepSecurity は「npm トークンは盗まれていない」、Microsoft は「npm を侵害する必要はなかった」で、**一次情報2つは「npm トークン窃取ではなく、リポジトリ側の権限(bot の PAT)経由」で一致**
 
 出典:
 - StepSecurity: https://www.stepsecurity.io/blog/compromised-next-branch-pushes-malicious-asyncapi-generator-generator-helpers-and-generator-components-to-npm
-- Microsoft(未読・403): https://www.microsoft.com/en-us/security/blog/2026/07/15/unpacking-asyncapi-npm-supply-chain-compromise-import-time-payload-delivery/
+- Microsoft: https://www.microsoft.com/en-us/security/blog/2026/07/15/unpacking-asyncapi-npm-supply-chain-compromise-import-time-payload-delivery/
 
 ## keyv / cacheable(ChainDrop)
 
@@ -199,7 +206,14 @@ scripts なし + `binding.gyp` のみのパッケージ(gyp の `<!(...)` でマ
   - → **「デフォルトで1日待ってくれるから安心」は不正確**。明示的に設定してはじめて強制される
 - 🟢 **11.1.3 で lockfile の再検証が入った**: 他所で弱いポリシーのもとで解決された lockfile(コミット済み・CI キャッシュ・古い pnpm 由来)が、公開直後のバージョンを**黙ってインストールすることはなくなった**(pnpm CHANGELOG)
   - → 壁打ちメモの「lockfile にポリシー違反があると素通りする問題は 11.1.3 で修正」は**正しかった**(前回「一致を確認できず」としたのは誤り。訂正)
-  - 同じ変更で #10438 も閉じられた(strict の自動有効化)
+- 🟢 **issue #10438 の原文(WebFetch で取得)**:
+  - タイトル「`minimumReleaseAge` not enforced when dependency already exists in lockfile」。2026-01-10 作成(pnpm 10.27.0 での報告)
+  - 内容: lockfile にすでに条件違反のバージョンが入っていると、`pnpm install`・`--fix-lockfile`・`--frozen-lockfile`・`--lockfile-only` のどれも**検査せずに通る**。新しく `pnpm add` する場合は正しく拒否される
+  - **メンテナの最初の回答は「This seems to be by design.」**(2026-01-23)。lockfile が最新ならリゾルブを飛ばすので、チェックも飛ぶ、という説明。回避策として `--resolution-only` か lockfile の削除が案内された
+  - その後、利用者から「少なくとも `--frozen-lockfile` では検査すべき」などの要望が続き、**2026-05-16 に PR #11583「fix: enforce minimumReleaseAge on existing lockfile entries」で修正され close**。メンテナが 05-18 に「🚢 11.1.3」とコメント
+  - 11.1.3 に上げた利用者から「36 lockfile entries failed verification」のエラーが出たという報告もあり、既存 lockfile が実際に素通りしていたことがわかる
+  - 「monorepo」「shared-workspace-lockfile」への言及はこの issue にはない
+  - ⚠️ 解釈: **「設定したから守られている」と思っていた状態が、実は約4か月「仕様」として素通りしていた**例。設定の効き方を思い込まないこと、の具体例になり得る
 - 🟢 `trustLockfile`(既定 false)を true にすると、lockfile の各エントリへの検証をスキップする。docs 自身が「外部の協力者が lockfile を編集できるなら false のままに」と警告
 - 🟢 `sharedWorkspaceLockfile: false` については、`minimumReleaseAgeExcludePrune` などの後片付けがその構成で正しく動かない問題が修正されてきた(CHANGELOG)。⚠️ 壁打ちメモの「モノレポ構成での設定漏れ」に当たる具体的な抜け穴の報告は見つからなかった
 - ⚠️ 解釈: Minimum Release Age 周りは **リリースごとに挙動の修正が続いている**。設定の意味が版によって変わり得る
@@ -207,6 +221,7 @@ scripts なし + `binding.gyp` のみのパッケージ(gyp の `<!(...)` でマ
 出典:
 - pnpm docs: https://github.com/pnpm/pnpm.io/blob/main/docs/settings/dependency-resolution.md
 - pnpm CHANGELOG(11.x): https://unpkg.com/pnpm@11.28.1/CHANGELOG.md
+- pnpm issue #10438: https://github.com/pnpm/pnpm/issues/10438
 
 ## 「攻撃者は開発者の環境を狙っている」
 
@@ -227,5 +242,6 @@ scripts なし + `binding.gyp` のみのパッケージ(gyp の `<!(...)` でマ
 
 ## 読めなかった一次情報
 
-- Socket(node-ipc)、Microsoft(AsyncAPI)、pnpm の GitHub issue ページ: アクセス拒否(403)
+- Socket(node-ipc): curl では 403、WebFetch では名前解決エラー。どちらでも読めず
 - Koi(PhantomRaven): 転送先で本文なし
+- (Microsoft の AsyncAPI 記事と pnpm の issue #10438 は、curl では 403 だったが WebFetch で読めた)
