@@ -1,167 +1,231 @@
 # research
 
 braindump.md の主張・事例の裏取り結果。出典つき。
-調査日: 2026-11-13。いずれも WebSearch の要約ベースで、**一次情報(原文)の確認は未了**。スライドに数値を載せる前に原文を当たること。
+最終更新: 2026-11-17(一次情報の確認と未調査事例の調査を反映)
 
-凡例: ✅ 複数ソースで一致 / ⚠️ ソース間で食い違い・一部のみ確認 / ❌ 確認できず・壁打ちメモと食い違い / ⬜ 未調査
+凡例:
+- 🟢 一次情報(当事者の報告・公式ドキュメント・論文本文・公式統計)を直接読んで確認
+- ✅ 一次は読めていないが、複数の二次情報で一致
+- ⚠️ 食い違い・一部のみ確認・解釈を含む
+- ❌ 確認できなかった / 誤りだった
+
+---
+
+## 早見表: 事例ごとに「どの対策で止まったか」
+
+| 事例 | 時期 | 実行のタイミング・経路 | install スクリプトのブロック | Provenance | 備考 |
+|---|---|---|---|---|---|
+| PhantomRaven | 2025-08〜 | HTTP URL の依存(RDD)を取得し、その中の preinstall で実行 | 🟢 止まる(preinstall) | — | **検知ツールをすり抜けた**(依存が「0」に見える)。npm v12 の `--allow-remote` 既定 none でも止まる |
+| chalk / debug ほか18パッケージ | 2025-09-08 | **ブラウザ上の実行時**に fetch / XHR / ウォレット API をフック | 🟢 効かない | — | install 時の対策は無関係 |
+| node-ipc | 2026-05-14 | **`require()` 時** | 🟢 効かない | — | 休眠メンテナの期限切れドメイン経由の乗っ取りの可能性 |
+| Phantom Gyp(Miasma) | 2026-06-03 | `binding.gyp` による**暗黙の node-gyp rebuild** | 🟢 止まる(`--ignore-scripts`、pnpm のビルド承認) | Sigstore 証明を偽造 | **`scripts` を見るチェックは素通り** |
+| AsyncAPI | 2026-07-14 | **`require()` 時** | 🟢 効かない | 🟢 **本物の Provenance 付き** | 正規の CI が公開 |
+| keyv / cacheable(ChainDrop) | 2026-08-04 | npm 側は **preinstall**。リポジトリ側は **IDE / AI エージェントのフック**(開くだけで実行) | 🟢 npm 側は止まる / リポジトリ側は無関係 | 🟢 **本物の Provenance 付き** | トークン失効で発火する仕掛け |
+
+読み取れること(⚠️ ここは解釈):
+- **「install スクリプトのブロック」で止まる攻撃と止まらない攻撃が、同じ時期に並行して存在している**(置き換わりではなく多様化)
+- 止まった事例でも、検知(PhantomRaven)や Provenance(keyv)は別の場所で破られている
+- Phantom Gyp・chalk・keyv はいずれも数時間で公開〜発覚〜削除まで進んでおり、**1日の Minimum Release Age は新規インストールには効いた可能性が高い**。ただし `require()` 時に動く型でも同じで、Minimum Release Age は「実行のタイミング」ではなく「公開からの経過時間」で守る別軸の対策
 
 ---
 
 ## node-ipc(import 時に発火)
 
-- ✅ 2026-05-14 に悪意ある3バージョン(9.1.6 / 9.2.3 / 12.0.1)が公開された
-- ✅ ペイロードは CommonJS エントリポイントの末尾に難読化して追加され、`require('node-ipc')` のたびに無条件で動く。npm のライフサイクルスクリプトには依存しない
-- ✅ 90 超の認証情報カテゴリを狙い、DNS トンネリング等で外部へ送信したとの報告
-- ✅ 経路は、休眠メンテナのアカウント乗っ取りの可能性(Socket の見立て。Snyk は「証拠ではなく手がかり」とする)
-- ✅ クリーンなバージョンは 9.2.1 / 12.0.0
-- ⚠️ 「Socket が約3分で検知」: 今回の検索結果では確認できなかった。原文要確認
-- ⚠️ ダウンロード数(週 約82万 / 1,000万超)は食い違ったまま。数値を使うなら npm の統計で確認
+- 🟢 2026-05-14(約14:25 UTC)に悪意ある3バージョン(9.1.6 / 9.2.3 / 12.0.1)が公開。直前の正規リリースは 2026-05-07(Snyk)
+- 🟢 ペイロードは CommonJS エントリポイントに即時実行関数として追加され、**import 時に実行**。preinstall / install / postinstall には依存しない(Snyk)
+- 🟢 90 超の認証情報カテゴリを狙い、`azurestaticprovider[.]net` へ送信(Snyk が StepSecurity の報告として引用)
+- 🟢 経路は、**期限切れになったメンテナのメールドメインを再取得し、npm のアカウント復旧を悪用した**可能性。ただし Snyk は「完全な証拠ではなく手がかり」としている。レジストリ・ソースリポジトリ・CI は侵害されていない可能性が高い
+- 🟢 2022年3月の peacenotwar(プロテストウェア)の件とは**別の事件**で、今回は認証情報窃取(Snyk)
+- 🟢 **週間ダウンロード数: 854,545**(2026-05-07〜05-13、攻撃直前の週。npm 公式ダウンロード API)→ 「週 約85万」で確定。「1,000万超」は誤り
+- ❌ 「Socket が約3分で検知」: Socket の原文はアクセス拒否(403)で読めず、他のソースにもこの数値はなかった。**使わない**
 
 出典:
-- Socket: https://socket.dev/blog/node-ipc-package-compromised
-- The Hacker News: https://thehackernews.com/2026/05/stealer-backdoor-found-in-3-node-ipc.html
 - Snyk: https://snyk.io/blog/malicious-node-ipc-versions-published-npm
+- npm ダウンロード API: https://api.npmjs.org/downloads/point/2026-05-07:2026-05-13/node-ipc
+- Socket(未読・403): https://socket.dev/blog/node-ipc-package-compromised
 
 ## Phantom Gyp(binding.gyp 経由の暗黙ビルド)
 
-- ✅ 2026-06-03 に 57 パッケージ・286 バージョン超。2時間未満で完了したとの報告
-- ✅ ライフサイクルスクリプトを一切使わず、`binding.gyp` があると npm が暗黙で `node-gyp rebuild` を走らせる挙動を利用。解析された binding.gyp は 157 バイト
-- ✅ 背後は **Miasma ワーム**。Bun ベースの認証情報窃取、CI/CD・クラウド認証情報を狙い、他のメンテナのパッケージを再公開して自己増殖
-- ⚠️ 命名は StepSecurity とも JFrog とも書かれている
-- 注意: 「Phantom Gyp」は手口の名前、キャンペーン / ワームの名前は「Miasma」
-
-出典:
-- Chainguard: https://www.chainguard.dev/de-DE/unchained/chainguard-artifacts-safe-from-miasma-phantom-gyp-npm-attack
-- Cyber Security News: https://cybersecuritynews.com/binding-gyp-supply-chain-attack-compromises-dozens-of-npm-packages/
-- SOC Prime: https://socprime.com/active-threats/miasma-supply-chain-attack-spreads-through-the-phantom-gyp-worm
-- Cryptika: https://www.cryptika.com/binding-gyp-supply-chain-attack-compromises-dozens-of-npm-packages-across-maintainer-accounts/
-
-## npm v12
-
-- ✅ 依存パッケージのライフサイクルスクリプト(preinstall / install / postinstall)と、**暗黙の node-gyp rebuild** が、`allowScripts` で許可しない限り動かなくなる(デフォルトでオフ)
-- ✅ `npm approve-scripts` / `npm deny-scripts` で管理。ブロック時は警告が出るがインストールは完了する
-- ⚠️ リリース日 2026-07-08 は DEV Community の1記事のみ。The Hacker News は 2026/07 の記事、InfoQ は 2026/08 の URL。**正確な日付は公式で確認**
-- 「Phantom Gyp の約1ヶ月後に塞がれた」という時系列は、6/3 → 7月、で整合はするが、v12 のこの変更が Phantom Gyp への対応として入ったかは未確認(v12 の計画自体はそれ以前から報じられている: gigazine 2026-06-11 の記事など)。**「対応して塞いだ」と言い切らない**
-
-出典:
-- The Hacker News: https://thehackernews.com/2026/07/npm-12-disables-install-scripts-by.html
-- Semgrep: https://semgrep.dev/blog/2026/rip-npm-postinstall-scripts-npm-v12-default-change
-- InfoQ: https://www.infoq.com/news/2026/08/npm-12-released/
-- npm/cli issue: https://github.com/npm/cli/issues/9424
-
-### 一次情報の確認: Phantom Gyp と `--ignore-scripts`(2026-11-15、原文を直接読んだ)
-
-- ✅ **命名は StepSecurity**。原文に「a technique we are calling "Phantom Gyp"」とある(JFrog 命名説は二次情報の誤りの可能性が高い。JFrog の原文は見つからなかった)。キャンペーン名 Miasma も StepSecurity が追跡している呼称
-- ✅ 2026-06-03。57 パッケージ・286 超のバージョン。「2時間未満のローリングキャンペーン」(StepSecurity)
-- ✅ 原文の要点(StepSecurity):
-  - 「preinstall / postinstall など、セキュリティツールが通常監視するライフサイクルスクリプトの代わりに、157バイトの `binding.gyp` を悪用」
-  - 「**ほとんどの install-script セキュリティチェックを完全にバイパス**する」(= `scripts` フィールドを見るチェックのこと)
-  - `package.json` に install スクリプトの宣言は一切ない。npm は `binding.gyp` を見つけると自動で `node-gyp rebuild` を実行する(ネイティブアドオン向けの仕様)
-  - 仕組みは gyp のコマンド置換構文 `<!(...)`。`sources` に `"<!(node index.js > /dev/null 2>&1 && echo stub.c)"` を置き、ペイロードを実行する
-- ✅ **`--ignore-scripts` の効果(Snyk の原文)**: 「`--ignore-scripts` は `binding.gyp` を持つパッケージに対する npm の暗黙の node-gyp rebuild フックをブロックする」。ただし「唯一の防御と見なすべきではない」(悪意あるパッケージ自体は取得・展開され得る、`--ignore-scripts` なしの後続の `npm rebuild` や他のツールでビルドされ得る、他のパッケージマネージャーでは挙動が違い得る)
-  - → **手元検証(npm 10.9.9)と一致**
-- ⚠️ StepSecurity の対策欄の書き方: 「`npm install --ignore-scripts` は postinstall フックをブロックし、**自動 node-gyp ビルドをブロックすることで** binding.gyp 経路が閉じる」。**2つを別の対策のように読める書き方**で、`--ignore-scripts` 単体で gyp も止まるとは明言していない。これが「ignore-scripts では gyp が止まらない」という印象の出所になり得る(推測)
-- ✅ ワームは盗んだ npm トークンでメンテナの全パッケージを列挙→ `binding.gyp` と `index.js` を注入→再公開。**Sigstore の Provenance 証明も偽造して**再感染パッケージが正規に署名されたように見せる(Snyk)。Snyk は TanStack の事件を「有効な SLSA Provenance 付きの悪意あるパッケージの最初の文書化された例」としている
-- ✅ RubyGems でも同種(`extconf.rb`)。GitHub リポジトリへの汚染として `.claude/` などの AI エージェント / エディタのフックも仕込む(Snyk)
-- ✅ 窃取情報の持ち出し先は GitHub(`github.com` / `api.github.com` への通信は CI では遮断されにくいため)
-
-結論: **事実として正確なのは「`scripts` を見る検知・チェックは素通りされた。`--ignore-scripts` を入れていれば暗黙の gyp ビルドも止まる(npm)」。**
-「`ignore-scripts` では gyp がブロックされない」とは言えない。
-
-出典(一次):
-- StepSecurity: https://www.stepsecurity.io/blog/binding-gyp-npm-supply-chain-attack-spreads-like-worm
-- Snyk: https://snyk.io/blog/node-gyp-supply-chain-compromise-self-propagating-npm-worm-binding-gyp
+- 🟢 **命名は StepSecurity**(原文「a technique we are calling "Phantom Gyp"」)。キャンペーン名は Miasma。JFrog 命名説は二次情報の誤りの可能性が高い
+- 🟢 2026-06-03。57 パッケージ・286 超のバージョン。2時間未満のローリングキャンペーン(StepSecurity)
+- 🟢 `package.json` に install スクリプトの宣言は一切なく、157 バイトの `binding.gyp` を追加。npm は `binding.gyp` を見つけると自動で `node-gyp rebuild` を実行する。gyp のコマンド置換 `<!(...)` で `node index.js` を実行(StepSecurity)
+- 🟢 StepSecurity は「セキュリティツールが通常監視するライフサイクルスクリプトの代わり」「**ほとんどの install-script セキュリティチェックを完全にバイパス**」と表現 = `scripts` フィールドを見るチェックが素通りされた
+- 🟢 **`--ignore-scripts` は npm の暗黙の node-gyp rebuild もブロックする**(Snyk)。ただし「唯一の防御と見なすべきではない」: パッケージ自体は取得・展開される、後続の `npm rebuild` などでビルドされ得る、他のパッケージマネージャーでは挙動が違い得る
+- ⚠️ StepSecurity の対策欄は「`--ignore-scripts` は postinstall をブロックし、自動 node-gyp ビルドをブロックすることで binding.gyp 経路が閉じる」と、**2つが別の対策に読める書き方**。「ignore-scripts では gyp が止まらない」という印象の出所になり得る(推測)
+- 🟢 ワームは盗んだ npm トークンでメンテナの全パッケージを列挙し、`binding.gyp` と `index.js` を注入して再公開。**Sigstore の Provenance 証明も偽造**する。RubyGems では `extconf.rb` で同種の手口。GitHub リポジトリには `.claude/` などの AI エージェント / エディタのフックも仕込む(Snyk)
+- 🟢 窃取情報の持ち出し先に GitHub を使う(CI では `github.com` への通信は遮断されにくいため)(Snyk)
 
 ### 手元検証: `--ignore-scripts` は暗黙の gyp ビルドを止めるか(2026-11-15)
 
-`package.json` に scripts なし + `binding.gyp` のみのパッケージ(gyp の `<!(...)` コマンド展開でマーカーファイルを作る)を tarball でインストールして確認した。
+scripts なし + `binding.gyp` のみのパッケージ(gyp の `<!(...)` でマーカーファイルを作る)を tarball でインストールした。
 
-| 環境 | 結果 |
+| 環境 | 暗黙の gyp ビルド |
 |---|---|
-| npm 10.9.9(デフォルト) | **実行された**(マーカーができた) |
+| npm 10.9.9(デフォルト) | 実行された |
 | npm 10.9.9 + `--ignore-scripts` | **実行されなかった** |
-| pnpm 10.28.0(デフォルト) | **実行されなかった**(ビルドスクリプトの承認待ちの警告) |
+| pnpm 10.28.0(デフォルト) | **実行されなかった**(ビルド承認待ちの警告) |
 
-- つまり少なくとも npm 10.9.9 / pnpm 10.28.0 では、`--ignore-scripts` やビルド承認制は暗黙の gyp ビルドも止める
-- 「`ignore-scripts` では gyp がブロックされない」は、**この検証では再現しなかった**
-- Phantom Gyp が突破したのは、ブロックを入れていない環境(特に CI)と、`scripts` フィールドだけを見て判定するツール・運用と考える方が整合的。**どちらなのかは一次情報で確認が必要**
-- 検証の限界: 単純な1パターンのみ。yarn / bun / 他バージョンは未確認
-
-## AsyncAPI(Provenance 付きで侵害)
-
-- ✅ 2026-07-14。@asyncapi の4パッケージ・5バージョン(generator 3.3.1、generator-helpers 1.1.1、generator-components 0.7.1、specs 6.11.2-alpha.1 / 6.11.2)
-- ✅ 正規の GitHub Actions リリースワークフロー + npm の OIDC Trusted Publisher 経由で公開されたため、**Provenance は本物**
-- ✅ ペイロードは `require()` 時に動く(インストール時ではない)。Miasma RAT / 情報窃取
-- ✅ 攻撃者は next ブランチへの push 権限を得て、プロジェクト自身のリリースパイプラインを使った(37個のおとり PR の中に1本、という報告もある)
-- ⚠️ npm トークンが盗まれたかは調査機関で食い違い(StepSecurity: 不要 / Aikido: 盗まれた)
-- ⚠️ specs のバージョンは 6.11.1 と書くソースもある
-- → 壁打ちメモの「Provenance 付きのまま侵害」は裏が取れた。「Trusted Publisher でも防げない」の例として使える
+→ Snyk の記述と一致。限界: 単純な1パターンのみ。yarn / bun は未検証
 
 出典:
-- Microsoft: https://microsoft.com/en-us/security/blog/2026/07/15/unpacking-asyncapi-npm-supply-chain-compromise-import-time-payload-delivery
-- Semgrep: https://semgrep.dev/blog/2026/miasma-v3-asyncapi-npm-hardening
-- BleepingComputer: https://bleepingcomputer.com/news/security/-asyncapi-npm-packages-infected-with-credential-stealing-malware
-- StepSecurity: https://stepsecurity.io/blog/compromised-next-branch-pushes-malicious-asyncapi-generator-generator-helpers-and-generator-components-to-npm
-- JFrog: https://research.jfrog.com/post/miasma-worm-returns-to-npm/
+- StepSecurity: https://www.stepsecurity.io/blog/binding-gyp-npm-supply-chain-attack-spreads-like-worm
+- Snyk: https://snyk.io/blog/node-gyp-supply-chain-compromise-self-propagating-npm-worm-binding-gyp
 
-## keyv(AI エージェント / IDE 設定ファイル)
+## npm v12
 
-- ✅ 2026年8月。keyv リポジトリに、`.claude/settings.json` の SessionStart フックと `.vscode/tasks.json` の folderOpen タスクが悪意ある commit で仕込まれた。**リポジトリを開くだけで** `npm install` なしに動き得る
-- ✅ 2つのフックは互いの設定ディレクトリのスクリプトを呼び合い、片方を消しても連鎖が止まらない(Upwind)
-- ✅ Claude / OpenAI / Codex / Cursor / Gemini 等の AI エージェントの認証情報ストアも収集対象
-- ✅ 侵害されたパッケージは有効な Provenance 付きで公開された(StepSecurity)
-- ⚠️ 規模は食い違い(StepSecurity: 444 パッケージ / 2,212 バージョン、別ソース: アカウントから11リリース)
-- ⚠️ **「ローテーションした瞬間に発火するトラップ」は SANS ISC の記述1件のみ**。仕組みは未確認。使うなら SANS / Wiz の原文を確認
-- ❌ 壁打ちメモの「Wave Six」という呼称は、今回のソースには出てこなかった。ソース上の名前は「ChainDrop」「Shai-Hulud の再燃」「Mini Shai-Hulud」など。**呼称は使わず、「keyv の事件」で行く方が安全**
-
-出典:
-- Cycode: https://cycode.com/blog/keyv-cacheable-npm-worm-ai-coding-agents/
-- StepSecurity: https://stepsecurity.io/blog/chaindrop-npm-worm
-- Upwind: https://upwind.io/feed/keyv-supply-chain-compromise-an-npm-worm-that-takes-its-orders-from-an-ethereum-smart-contract
-- SANS ISC: https://mail2.dshield.org/diary/33218
-- Mend: https://www.mend.io/blog/keyv-malicious-packages
-
-## pnpm の Minimum Release Age
-
-- ⚠️ 11.1.3 のリリースノートで #10438 が閉じられているが、内容は「`minimumReleaseAge` を明示設定したら `minimumReleaseAgeStrict` を自動で有効にする」変更。壁打ちメモの「lockfile にポリシー違反のバージョンがあると素通りする問題を修正」とは**一致が確認できなかった**
-- ✅ 11.3 で `trustLockfile`(lockfile の各エントリに対して `minimumReleaseAge` を再適用するかの設定)が入った。こちらが「lockfile 素通り」に近い話かもしれない
-- ✅ 11.4 に、バイパス時に警告を出す仕組み(`--force` や `pnpm update` は整合性チェックをバイパスしない)
-- ✅ 12.0.0-rc.4 に `sharedWorkspaceLockfile: false` に関する記述がある
-- ❌ `shared-workspace-lockfile = false` でのバイパスの具体的な報告は、今回の検索では見つからなかった
-- ⬜ 「デフォルト1日(pnpm v11)」は未確認
-- → **Minimum Release Age の「抜け穴」を話す場合は、pnpm の issue / リリースノート原文を確認してから**。確認できるまでは「設定の組み合わせ次第で意図せず無効になり得る」という抽象度に留める
+- 🟢 **2026-06-09 に GitHub が v12 の破壊的変更を予告**。この予告の時点で「`binding.gyp` があり install スクリプトがないパッケージも、npm が暗黙の `node-gyp rebuild` を走らせるのでブロックされる」と明記されている
+  - → **Phantom Gyp(06-03)の6日後の予告に、すでに gyp のブロックが含まれていた**。ただし、Phantom Gyp を受けて入れた変更なのかは原文に書かれていない。⚠️「Phantom Gyp に対応して塞いだ」とは言い切らず、「直後に予告された v12 で塞がれた」という時系列に留める
+  - 予告時点で、これらの変更は npm 11.16.0 以降で警告として利用可能だった
+- 🟢 **2026-07-08 に v12 が GA(latest タグ)**(GitHub Changelog)
+- 🟢 v12 で既定になったもの:
+  - `allowScripts` 既定オフ: 依存の preinstall / install / postinstall と**暗黙の node-gyp ビルド**は、明示的に許可しない限り動かない
+  - `--allow-git` 既定 none: Git 依存(直接・推移的)を解決しない
+  - `--allow-remote` 既定 none: リモート URL(https の tarball など)の依存を解決しない → **PhantomRaven の RDD 経路も閉じる**
+  - `npm approve-scripts` / `npm deny-scripts` で許可リストを管理し、`package.json` にコミットする
+- 🟢 npm 公式ドキュメント: `ignore-scripts`(既定 false)「true なら package.json に書かれたスクリプトを実行しない」。`min-release-age`(既定 null、日数)もある。満たすバージョンがなければエラーになる
+- 🟢 同じリリースで、2FA バイパスの granular access token の、最も機微な用途の廃止も始まった
 
 出典:
-- pnpm 11.1.3: https://newreleases.io/project/npm/pnpm/release/11.1.3
-- pnpm 11.3: https://pnpm.io/blog/releases/11.3
-- pnpm 11.4: https://pnpm.io/blog/releases/11.4
-- pnpm 12.0.0-rc.4: https://newreleases.io/project/github/pnpm/pnpm/release/v12.0.0-rc.4
-- 解説: https://lilting.ch/en/articles/pnpm-11-minimum-release-age-default-shai-hulud-defense
+- GitHub Changelog(06-09 予告): https://github.blog/changelog/2026-06-09-upcoming-breaking-changes-for-npm-v12/
+- GitHub Changelog(07-08 GA): https://github.blog/changelog/2026-07-08-npm-install-time-security-and-gat-bypass2fa-deprecation/
+- npm docs(config): https://docs.npmjs.com/cli/v12/using-npm/config
+
+## AsyncAPI(本物の Provenance 付きで侵害)
+
+- 🟢 2026-07-14 07:10 UTC。2つの AsyncAPI リポジトリから、4パッケージの悪意あるバージョンが公開された(StepSecurity)
+  - generator 3.3.1 / generator-helpers / generator-components、specs 6.11.2 と 6.11.2-alpha.1 など(StepSecurity のリストに 6.11.1 も並んでいるが、直前の正規版との対比の可能性あり。⚠️ バージョンを画面に出すなら原文の表を再確認)
+- 🟢 攻撃者は next ブランチへの push 権限を得て、プロジェクト自身の GitHub Actions リリースワークフロー + npm の OIDC Trusted Publisher で公開させた。**StepSecurity は「npm トークンは盗まれていない」と明言**
+- 🟢 原文: 「パッケージは正当な SLSA Provenance 証明を持つ。証明するのはプロジェクトの正規ワークフローが作ったことだけで、**それを起動したコミットが正当だったことではない**。Provenance は侵害された push 認証情報からは守らない」
+- 🟢 ドロッパーは**ライブラリの読み込み時(`require()`)に実行**され、インストール時ではない
+- 🟢 同日 11:18 UTC までに5バージョンすべてが unpublish。「新規インストールは安全、露出期間中の既存インストールと lockfile は安全ではない」
+- ⚠️ Aikido は「npm トークンが盗まれた」としている(二次情報経由)。StepSecurity と食い違うので、トークン窃取の有無は語らない
+- ❌ Microsoft の原文はアクセス拒否(403)で読めなかった
+
+出典:
+- StepSecurity: https://www.stepsecurity.io/blog/compromised-next-branch-pushes-malicious-asyncapi-generator-generator-helpers-and-generator-components-to-npm
+- Microsoft(未読・403): https://www.microsoft.com/en-us/security/blog/2026/07/15/unpacking-asyncapi-npm-supply-chain-compromise-import-time-payload-delivery/
+
+## keyv / cacheable(ChainDrop)
+
+- 🟢 2026-08-04。keyv のメンテナの **GitHub アカウント**が乗っ取られた(Wiz)。9:00 UTC から、まずリポジトリに IDE の永続化ペイロードを仕込み、その後に悪意あるバージョンを公開(Wiz)
+- 🟢 npm 側の経路は **`"preinstall": "node setup.mjs"`**。Bun ランタイムを取得して難読化された第2段を実行し、クラウド鍵・Vault・Kubernetes・GitHub Actions のシークレット・npm トークンなどを収集。盗んだ npm トークンで他のパッケージにも同じフックを注入し、再公開する**ワーム**(SANS ISC)
+  - → **install スクリプトをブロックしていれば npm 経由の経路は止まる**。流行の型も、まだ現役
+- 🟢 リポジトリ側の経路: `.claude/settings.json` の SessionStart と `.vscode/tasks.json` の folderOpen。**クローンしたフォルダを開くだけで実行**され、インストールもビルドも不要(SANS ISC、StepSecurity)
+- 🟢 **本物の SLSA Provenance 付き**。メンテナの GitHub アカウントで汚染したコミットとタグを push し、正規のリリースワークフローに公開させた。StepSecurity の原文: 「Provenance はどのコミットがビルドされたかを証明する。そのコミットが承認されたものだとは証明できない」
+- 🟢 規模: **444 パッケージ・2,212 バージョン、4時間未満**(StepSecurity。09:40〜13:20 UTC)。SANS は「440 超・2,000 超のバージョン」。食い違いはなく、「11リリース」は初期の数字と思われる
+- 🟢 名前: StepSecurity は **ChainDrop** と呼んでいる。❌ 壁打ちメモの「Wave Six」はどのソースにも出てこない → 使わない
+- 🟢 **トークン失効で発火する仕掛け**(SANS ISC「Don't Revoke That Token Yet」):
+  - 盗んだ GitHub トークンを `~/.config/gh-token-monitor/` に書き込み、macOS の LaunchAgent / Linux の systemd ユーザーサービスとして常駐(説明は「GitHub Token Validity Monitor」と無害を装う)
+  - 60秒ごとにそのトークンで GitHub API を叩き、**トークンが失効して 4xx が返った瞬間に、遠隔から渡されたハンドラ文字列を eval**し、痕跡を消して終了する
+  - ハンドラの中身は実行時に取得されるため、公開分析では不明(データ破壊かもしれないし、何もしないかもしれない)
+  - 推奨手順: **先にネットワークから隔離**(4xx が返らないので発火しない)→ 常駐を除去 → その後で失効(npm トークンを最初に)。「ローテーションではなく失効」
+  - SANS の結び: 「新しいのは認証情報の窃取ではなく、インストール不要の実行経路と、**こちらの対処の反射を引き金に変える**仕掛け」
+  - 注意: SANS の著者は自身が関わるツールにも言及している(利益相反の開示あり)。仕掛けの記述自体は Socket・Wiz・Kodem の公開調査に基づく
+
+出典:
+- Wiz: https://www.wiz.io/blog/keyv-and-cacheable-npm-supply-chain-attack
+- StepSecurity: https://www.stepsecurity.io/blog/chaindrop-npm-worm
+- SANS ISC: https://isc.sans.edu/diary/33218
+
+## PhantomRaven(依存が見えない)
+
+- ✅ Koi Security が発見・命名。2025年8月に開始、**126 パッケージ・86,000 超のインストール**。公表時点で 80 超がまだ公開中(The Hacker News、The Register)
+- 🟢 Sonatype が追加で 83 パッケージを特定し、計 200 超に。Adobe や Airbnb を装うもの、MCP サーバーを装うものもある(Sonatype)
+- ✅ 手口は **Remote Dynamic Dependencies(RDD)**: 依存先を `packages.storeartifact[.]com` などの HTTP URL で指定し、npm がインストールのたびに外部サーバーから取得する。パッケージ本体には悪意あるコードがない
+- ✅ Koi の研究者の言葉: 「npmjs.com はその URL を辿らない。セキュリティスキャナーも取得しない。依存解析ツールも無視する。**どの自動セキュリティシステムから見ても『依存 0』**」
+- ✅ 取得された依存の**preinstall フック**でペイロードを実行 → install スクリプトのブロックで止まる。すり抜けたのは**検知**のほう
+- ✅ パッケージ名は **slopsquatting**(LLM がハルシネーションで出す、もっともらしいが実在しない名前)を狙って登録
+- 🟢 攻撃者は手口を段階的に進化させた: 同じパッケージの 1.0.0 は RDD なし、1.0.3 / 99.0.0 で RDD を使うようになった(Sonatype)
+- 🟢 サーバー側で「ある利用者には無害なコード、別の利用者にはマルウェア」と出し分けられるため解析が難しい(Sonatype)
+- ❌ Koi の原文は、現在 Palo Alto Networks のページへ転送され、本文が読めなかった
+- ❌ 壁打ちメモの「10万件超」は確認できず。数字は「126 パッケージ・8.6万インストール」(初報)、「200 超」(Sonatype の追加後)
+
+出典:
+- Sonatype: https://www.sonatype.com/blog/phantomraven-npm-malware
+- The Hacker News: https://thehackernews.com/2025/10/phantomraven-malware-found-in-126-npm.html
+- The Register: https://www.theregister.com/2025/10/30/phantomraven_npm_malware/
+- Koi(本文読めず): https://www.koi.ai/blog/phantomraven-npm-malware-hidden-in-invisible-dependencies
+
+## chalk / debug(2025年9月、ブラウザ上の実行時)
+
+- 🟢 2025-09-08 13:16 UTC に Aikido のフィードが検知。chalk・debug など**18 の人気パッケージ**、合計で**週20億ダウンロード超**(Aikido)
+- 🟢 改ざんされたのは `index.js`。ペイロードは**ウェブサイトのクライアント側で実行される**、ブラウザ上のインターセプター。`fetch`・`XMLHttpRequest`・`window.ethereum` などのウォレット API をフックし、送金先や承認先を攻撃者のものに書き換える(Aikido)
+  - → install スクリプトのブロックは関係ない。**サービス(エンドユーザー)側**を狙った例
+- 🟢 原因はメンテナへの**フィッシング**。送信元ドメイン `npmjs.help` は攻撃の3日前(2025-09-05)に登録されていた(Aikido)
+- ⚠️ 「5分で検知」「約2.5時間公開されていた」は二次情報のみ
+
+出典:
+- Aikido: https://www.aikido.dev/blog/npm-debug-and-chalk-packages-compromised
+
+## 検知ツールの精度(論文)
+
+論文: "Understanding NPM Malicious Package Detection: A Benchmark-Driven Empirical Analysis"(arXiv:2603.27549、2026年3月、プレプリント=査読前)
+
+- 🟢 11 ツール・16 バリアントを、悪意ある 6,420 / 無害な 7,288 パッケージの共通ベンチマークで評価
+- 🟢 **ML ベースのツールは時間とともに大きく劣化**: SAP_DT は 2021年の 87.15% → 2023年の 39.49%。ProfMal は 90.42% → 65.93%。Cerebro は 76.61% → 27.04%(2022 → 2024〜2025)。一方 Packj_static は全期間 97% 超、IntelGuard は 2021年以降 91% 超を維持
+  - どのツールも検知パラメータは固定 → 差は**マルウェアの側の変化**によるもの
+- 🟢 原因は「攻撃が高度化した(concept drift)」ではなく **concept convergence**: 難読化は減り、マルウェアは**単純になって**、特徴量の上で無害なコードと統計的に区別できなくなった
+- 🟢 精度と再現率は、ツールが「コードの能力」と「悪意」の曖昧さをどう解くかで構造的に決まる(同じ API を正規のコードも悪意あるコードも使う)
+- 🟢 **悪意あるパッケージの 80.3% は回避技術を使っていない**。エコシステムに公開前の必須スキャンがないため
+- 🟢 ツールを組み合わせると精度 97.21%・F1 97.02% まで上がり、単体のどのツールより高い
+- ⚠️ 査読前のプレプリント。数値を画面に出すなら「プレプリント」と付記する
+
+出典:
+- arXiv: https://arxiv.org/abs/2603.27549
+
+## パッケージマネージャー間の仕様差(install スクリプト / リリース待機)
+
+| | install スクリプトの扱い(既定) | リリース待機 |
+|---|---|---|
+| npm v12 | 🟢 `allowScripts` 既定オフ。依存の preinstall / install / postinstall と**暗黙の node-gyp ビルド**も止まる。`npm approve-scripts` で許可 | 🟢 `min-release-age`(日数、既定 null=無効) |
+| pnpm | 🟢 `strictDepBuilds` 既定 true(未承認のビルドスクリプトがあると失敗)。`allowBuilds` で許可・拒否を指定。`ignoreScripts` は `.pnpmfile.mjs` の実行は止めない | 🟢 `minimumReleaseAge` 既定 **1440 分(1日)** |
+| Yarn(Berry) | 🟢 `enableScripts` 既定 false(サードパーティの postinstall を実行しない。ワークスペース自身のものは実行) | 🟢 `npmMinimalAgeGate` |
+| Bun | 🟢 「default-secure」: 許可リスト(`trustedDependencies`)にあるパッケージのライフサイクルスクリプトだけ実行 | 未確認 |
+
+- ⚠️ 名前も粒度もバラバラ(allowScripts / allowBuilds / enableScripts / trustedDependencies)。総称としては「ライフサイクルスクリプトのブロック」
+- ⚠️ 各ツールで暗黙の node-gyp ビルドが止まるかは、npm v12(公式明記)と pnpm 10.28.0(手元検証)以外は未確認
+
+出典:
+- npm docs: https://docs.npmjs.com/cli/v12/using-npm/config
+- pnpm docs: https://github.com/pnpm/pnpm.io/blob/main/docs/settings/build.md / https://github.com/pnpm/pnpm.io/blob/main/docs/settings/dependency-resolution.md
+- Yarn docs: https://yarnpkg.com/configuration/yarnrc
+- Bun docs: https://bun.sh/docs/install/lifecycle
+
+## pnpm の Minimum Release Age(仕様と抜け穴)
+
+- 🟢 `minimumReleaseAge` 既定 **1440 分(1日)**。推移的依存を含む**すべての依存に適用**される → 「依存の依存には効かない」は誤解(pnpm docs)
+- 🟢 **既定値のままだと「緩いモード」**: 条件を満たすバージョンがないとき、**条件を満たさない新しいバージョンにフォールバックしてインストールを続ける**(`minimumReleaseAgeStrict` の既定は、`minimumReleaseAge` を明示設定したときだけ true。組み込みの既定 1440 分は後方互換のため非 strict)(pnpm docs)
+  - 11.1.3 の CHANGELOG: 緩いモードでは、未成熟なバージョンを `minimumReleaseAgeExclude` に**自動で追加**してインストールを進める(info メッセージが出る)
+  - → **「デフォルトで1日待ってくれるから安心」は不正確**。明示的に設定してはじめて強制される
+- 🟢 **11.1.3 で lockfile の再検証が入った**: 他所で弱いポリシーのもとで解決された lockfile(コミット済み・CI キャッシュ・古い pnpm 由来)が、公開直後のバージョンを**黙ってインストールすることはなくなった**(pnpm CHANGELOG)
+  - → 壁打ちメモの「lockfile にポリシー違反があると素通りする問題は 11.1.3 で修正」は**正しかった**(前回「一致を確認できず」としたのは誤り。訂正)
+  - 同じ変更で #10438 も閉じられた(strict の自動有効化)
+- 🟢 `trustLockfile`(既定 false)を true にすると、lockfile の各エントリへの検証をスキップする。docs 自身が「外部の協力者が lockfile を編集できるなら false のままに」と警告
+- 🟢 `sharedWorkspaceLockfile: false` については、`minimumReleaseAgeExcludePrune` などの後片付けがその構成で正しく動かない問題が修正されてきた(CHANGELOG)。⚠️ 壁打ちメモの「モノレポ構成での設定漏れ」に当たる具体的な抜け穴の報告は見つからなかった
+- ⚠️ 解釈: Minimum Release Age 周りは **リリースごとに挙動の修正が続いている**。設定の意味が版によって変わり得る
+
+出典:
+- pnpm docs: https://github.com/pnpm/pnpm.io/blob/main/docs/settings/dependency-resolution.md
+- pnpm CHANGELOG(11.x): https://unpkg.com/pnpm@11.28.1/CHANGELOG.md
 
 ## 「攻撃者は開発者の環境を狙っている」
 
-ユーザーの推測(開発者環境は資源を奪いやすく、人間へのソーシャルハッキングもしやすいので価値が高い)に対して:
+ユーザーの推測(開発者環境は資源を奪いやすく、人間へのソーシャルハッキングもしやすいので価値が高い)について:
 
-- ✅ **「開発者環境・CI が狙われている」は裏が取れる**
-  - Shai-Hulud 系の窃取マルウェアは、開発者環境・CI/CD ツールの 469 か所を走査(GitGuardian の報告を The Hacker News が引用)
-  - 開発者ワークステーションには Git にコミットされていない秘密情報があり、1つのトークンがソースコードへのアクセスにつながり得る
-  - SAP の npm パッケージ事件では、VS Code や Claude Code の設定ファイルによる永続化も試みられた
-  - AI ツールの認証情報と MCP サーバー設定の収集を狙った最初のペイロード、との報告(SC World)
-  - Mini Shai-Hulud(TeamPCP の仕業とされる)は PyPI・npm・PHP を横断し、1,800 超の開発者リポジトリの窃取情報を確保。VPN 認証情報、暗号資産ウォレット、Slack/Discord のセッショントークンも対象
-  - Shai-Hulud 2.0 は 600 超のパッケージに感染、2万超の GitHub リポジトリを窃取データの置き場に使い、1.5万件の秘密情報が漏れた。長期有効なトークンと CI 環境が弱点(Riptides の事後分析)
-- ❌ 「計算資源の奪取がしやすい」「ソーシャルハッキングがしやすい」という**理由の部分は、今回のソースでは裏が取れていない**。「狙われている」という事実と、「なぜ狙うか」の解釈は分けて扱う
-- 1回の検索で、各社ブログ・転載記事が中心。業界横断の権威ある調査レポートは見つかっていない
+- 🟢 **開発者環境・CI が主な標的になっている**ことは、今回読んだ一次情報でも一貫している
+  - keyv: 「クローンしたフォルダを開くだけ」で実行。SANS は対象者に「リポジトリをクローンしたセキュリティエンジニア」も含まれると指摘
+  - Phantom Gyp / keyv / AsyncAPI: 収集対象はクラウド鍵、CI のシークレット、npm / GitHub トークンなど**開発・配布のための認証情報**
+  - ワーム型(Miasma、ChainDrop)は、盗んだ npm トークンで**次のパッケージを汚染する**。開発者の認証情報そのものが次の攻撃の足場になる
+- ✅ 二次情報: Shai-Hulud 系の窃取マルウェアは開発者環境・CI/CD の 469 か所を走査(GitGuardian の報告を The Hacker News が引用)。AI ツールの認証情報や MCP サーバー設定も収集対象(SC World)
+- 🟢 反例として押さえておく: chalk / debug は**エンドユーザーのブラウザ**(サービス側)を狙った。標的は開発者環境だけではない
+- ⚠️ 「計算資源を奪いやすい」「ソーシャルハッキングしやすい」という**理由づけは裏が取れていない**。言えるのは「開発者の認証情報は、配布経路そのものへのアクセスになる(ワームの足場になる)」まで。理由を語るなら「推測」と明示する
 
 出典:
+- 上記各事例の出典
 - The Hacker News: https://thehackernews.com/2026/09/shai-huluds-reach-just-grew-to-469.html
-- CSO Online: https://www.csoonline.com/article/4165420/sap-npm-package-attack-highlights-risks-in-developer-tools-and-ci-cd-pipelines.html
 - SC World: https://www.scworld.com/news/new-mini-shai-hulud-attack-targets-npm-ecosystem
-- Security Boulevard: https://securityboulevard.com/2026/05/1800-developers-hit-in-mini-shai-hulud-supply-chain-attack-across-pypi-npm-and-php/
-- Backslash: https://www.backslash.security/blog/shai-huluds-new-frontier
 
-## 未調査
+## 読めなかった一次情報
 
-- ⬜ PhantomRaven(2025年秋、「10万件超」等の数値)
-- ⬜ chalk/debug 事件(2025年9月)
-- ⬜ 検知ツール(ML ベース)の精度劣化の数値(87% → 39% など)。元論文が必要
-- ⬜ `allowScripts` / `onlyBuiltDependencies` / Bun の `trustedDependencies` の仕様の差
+- Socket(node-ipc)、Microsoft(AsyncAPI)、pnpm の GitHub issue ページ: アクセス拒否(403)
+- Koi(PhantomRaven): 転送先で本文なし
