@@ -272,3 +272,29 @@ scripts なし + `binding.gyp` のみのパッケージ(gyp の `<!(...)` でマ
 出典:
 - VoidZero(ベータ告知): https://voidzero.dev/posts/announcing-vite-plus-beta
 - InfoQ(1.0): https://infoq.com/news/2026/10/cloudflare-viteplus-stable
+
+## 一般によく挙げられている対策(使う側)(2026-11-17、ブログ・ガイドの横断)
+
+複数の 2026 年のブログ・ガイドで共通して挙がっているもの(⚠️ いずれも二次情報。設定名・既定値は research.md 内の公式ドキュメント確認分を正とする):
+
+| 対策 | 中身 | 挙げている例 |
+|---|---|---|
+| install スクリプトの停止 | `ignore-scripts=true`、許可リスト(npm `allowScripts` / pnpm `allowBuilds` など)。esbuild・sharp・Playwright など必要なものだけ許可 | OpenReplay、Arrange Act Assert、codercops ほか多数 |
+| 公開直後のバージョンを避ける(クールダウン) | npm `min-release-age`(v11.10.0〜)、pnpm `minimumReleaseAge`、Yarn `npmMinimalAgeGate`。「数日待て」 | Classmethod、@IT(Mini Shai-Hulud の記事)、bodadotsh/npm-security-best-practices |
+| lockfile の固定 | lockfile をコミットし、CI では `npm ci`。lockfile は意図しない更新を防ぎ、クールダウンは lockfile の汚染を防ぐ、と組み合わせで語られる | codercops、bastion ほか |
+| Git / URL 依存の禁止 | `allow-git=none` など | OpenReplay ほか |
+| 依存の検査・スキャン | `npm audit`、Socket などの PR スキャン | codercops、bastion |
+| 公開経路の確認 | provenance バッジ、trusted publishing の有無 | 複数(使う側にとっては「選ぶ時の目安」) |
+
+公開する側向け(この発表の聴衆には主ではない): trusted publishing(OIDC)、パスキー / ハードウェアキーの 2FA、CI(`pull_request_target` など)の堅牢化。
+
+- 限界として繰り返し書かれていること: クールダウンは「数時間〜数日で消される侵害」しか捕まえられない。ignore-scripts は実行時のコードに埋め込まれた悪意は防げない(→ スライド 7・8 の論点と一致)
+
+出典(二次):
+- OpenReplay: https://blog.openreplay.com/ja/npm-サプライチェーン防御/
+- Classmethod(min-release-age): https://dev.classmethod.jp/articles/npm-v11-min-release-age/
+- Arrange Act Assert: https://arrangeactassert.com/posts/the-package-manager-settings-that-would-have-blocked-the-axios-attack/
+- codercops: https://blog.codercops.com/blog/npm-supply-chain-hardening-checklist-2026/
+- bastion: https://bastion.tech/blog/npm-supply-chain-attacks-2026-saas-security-guide
+- npm-security-best-practices: https://github.com/bodadotsh/npm-security-best-practices
+- @IT: https://atmarkit.itmedia.co.jp/ait/articles/2605/18/news019.html
