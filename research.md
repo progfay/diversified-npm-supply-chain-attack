@@ -245,3 +245,30 @@ scripts なし + `binding.gyp` のみのパッケージ(gyp の `<!(...)` でマ
 - Socket(node-ipc): curl では 403、WebFetch では名前解決エラー。どちらでも読めず
 - Koi(PhantomRaven): 転送先で本文なし
 - (Microsoft の AsyncAPI 記事と pnpm の issue #10438 は、curl では 403 だったが WebFetch で読めた)
+
+## Node.js の標準機能で代用できる例(Node.js v26.13.1 公式ドキュメント、2026-11-17 確認)
+
+| よく使われるパッケージ | Node.js の標準機能 | 追加されたバージョン |
+|---|---|---|
+| chalk(文字に色をつける) | 🟢 `util.styleText()` | v21.7.0 / v20.12.0 で追加。v23.5.0 / v22.13.0 で stable。v26.1.0 で16進カラー対応 |
+| throttle / debounce 系 | 🟢 `util.throttle()` / `util.debounce()` | v26.10.0 で追加(⚠️ かなり新しい) |
+| rimraf(ディレクトリの再帰削除) | 🟢 `fs.rm(path, { recursive: true })` | v14.14.0 で追加 |
+| uuid | 🟢 `crypto.randomUUID()`(v7 は `crypto.randomUUIDv7()` もある) | v15.6.0 / v14.17.0 で追加 |
+
+- 注意: `util.throttle` / `util.debounce` は v26.10.0 からなので、LTS で使えるかは聴衆の環境次第。例に出すなら「最近入った」と添える
+
+出典:
+- https://nodejs.org/api/util.html
+- https://nodejs.org/api/crypto.html
+- https://nodejs.org/api/fs.html
+
+## Vite+(全部入りツールチェーン)
+
+- ✅ VoidZero による MIT ライセンスのツールチェーン。Vite・Vitest・Oxlint・Oxfmt・Rolldown・tsdown とタスクランナーを、`vp` コマンド1つにまとめる
+- ✅ 2026年にアルファ → ベータ(8月ごろ)→ 1.0(9〜10月ごろ。日付はソースで食い違い)
+- ⚠️ 「VoidZero が Cloudflare に買収された」との報道あり(InfoQ)。一次未確認
+- ⚠️ 二次情報のみ。スライドで具体的に触れるなら voidzero.dev の原文を確認する
+
+出典:
+- VoidZero(ベータ告知): https://voidzero.dev/posts/announcing-vite-plus-beta
+- InfoQ(1.0): https://infoq.com/news/2026/10/cloudflare-viteplus-stable
