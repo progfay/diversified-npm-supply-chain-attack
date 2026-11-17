@@ -3,5 +3,26 @@
   "stylesheets": [
     "design-system/system.css"
   ],
-  "slides": []
+  "slides": [
+    "01-title.html",
+    "02-self-intro.html",
+    "03-npm-install.html",
+    "04-why-npm.html",
+    "05-common-defenses.html",
+    "06-is-it-enough.html",
+    "07-postinstall-limit.html",
+    "08-attacks-increase.html",
+    "09-mra-premise.html",
+    "10-no-silver-bullet.html",
+    "11-what-to-trust.html",
+    "12-dependency-is-trust.html",
+    "13-substitute.html",
+    "14-prepare-for-breach.html",
+    "15-not-only-keys.html",
+    "16-layer.html",
+    "17-defaults-change.html",
+    "18-configured-not-protected.html",
+    "19-reflex-trigger.html",
+    "20-summary.html"
+  ]
 }
