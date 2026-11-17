@@ -32,8 +32,8 @@
   <h1>postinstall を止めても、コードは動く</h1>
   <ul>
     <li>悪意あるコードは、パッケージを <code>require</code> / <code>import</code> した時点でも動かせる</li>
-    <li>node-ipc(2026年5月): 乗っ取られたアカウントから公開。<code>require</code> しただけで認証情報を盗む</li>
-    <li>AsyncAPI(2026年7月): 正規の CI から公開。読み込むと遠隔操作ツールを仕込む</li>
+    <li>node-ipc(2026年5月): <code>require</code> しただけで、クラウドの鍵・SSH 鍵・GitHub のトークンなどを盗む</li>
+    <li>AsyncAPI(2026年7月): 読み込むと、PC を外から遠隔操作できるマルウェアを仕込む</li>
   </ul>
   <aside class="notes"></aside>
 </body>
