@@ -298,3 +298,13 @@ scripts なし + `binding.gyp` のみのパッケージ(gyp の `<!(...)` でマ
 - bastion: https://bastion.tech/blog/npm-supply-chain-attacks-2026-saas-security-guide
 - npm-security-best-practices: https://github.com/bodadotsh/npm-security-best-practices
 - @IT: https://atmarkit.itmedia.co.jp/ait/articles/2605/18/news019.html
+
+## 推移的依存の例: eslint → … → keyv(2026-11-18、npm レジストリで確認)
+
+- 🟢 各パッケージの最新版の `dependencies`(registry.npmjs.org/<name>/latest):
+  - eslint 10.15.0 → file-entry-cache(`11.1.5 || >11.1.6 <12`)
+  - file-entry-cache 11.1.5 → flat-cache(`^6.1.23`)
+  - flat-cache 6.1.23 → cacheable(`^2.5.0`)
+  - cacheable 2.5.0 → keyv(`^5.6.0`)
+- → **eslint を入れただけで、2026年8月に侵害された keyv / cacheable の名前空間のパッケージが入る**
+- 注意: これは「今の最新版」の依存関係。事件当時のバージョンでの経路は確認していない(当時は `eslint → file-entry-cache → flat-cache → keyv` だったとする資料もある)。スライドでは「今の依存関係だと」と言う
