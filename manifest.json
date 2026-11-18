@@ -17,13 +17,15 @@
     "11-prepare.html",
     "12-prepare-1.html",
     "13-dependency-is-trust.html",
-    "14-substitute.html",
-    "15-self-build.html",
-    "16-prepare-2.html",
-    "17-prepare-for-breach.html",
-    "18-prepare-3.html",
-    "19-defaults-change.html",
-    "20-layer.html",
-    "21-summary.html"
+    "14-reduce-trust.html",
+    "15-substitute.html",
+    "16-self-build.html",
+    "17-prepare-2.html",
+    "18-prepare-for-breach.html",
+    "19-limit-reach.html",
+    "20-prepare-3.html",
+    "21-defaults-change.html",
+    "22-layer.html",
+    "23-summary.html"
   ]
 }
