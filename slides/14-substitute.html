@@ -31,6 +31,8 @@
     <li>Node.js などの基盤の標準機能</li>
     <li>Vite+ のような全部入り</li>
   </ul>
-  <aside class="notes"></aside>
+  <aside class="notes">
+    減らし方の1つが、すでに信頼しているもので代用することです。たとえば Node.js の標準機能。chalk の代わりに util.styleText、uuid の代わりに crypto.randomUUID、rimraf の代わりに fs.rm が使えます。最近は util.throttle も入りました。Node.js 自体はもう信頼して使っているので、信頼する相手は増えません。Vite+ のように、ツール一式をまとめて提供してくれるものに寄せるのも、同じ考え方です。
+  </aside>
 </body>
 </html>
