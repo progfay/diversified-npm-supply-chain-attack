@@ -2,7 +2,7 @@
 <html lang="ja">
 <head>
   <meta charset="utf-8">
-  <title>なぜ npm が狙われる?</title>
+  <title>なぜ npm が狙われる？</title>
   <link rel="stylesheet" href="../design-system/system.css">
   <style>
     .slide {
@@ -26,57 +26,19 @@
     .slide p { margin: 0; text-wrap: pretty; }
     .slide code { font-family: var(--font-mono); }
     .slide strong { color: var(--color-accent); }
-    .tree { width: 100%; height: auto; display: block; }
-    .tree line { stroke: var(--color-line); stroke-width: 2; }
-    .tree rect { fill: var(--color-surface); stroke: var(--color-line); stroke-width: 2; }
-    .tree text { fill: var(--color-ink); font-family: var(--font-mono); font-size: 20px; text-anchor: middle; dominant-baseline: central; }
-    .tree .self rect { stroke: var(--color-accent); }
-    .tree .self text { fill: var(--color-accent); }
-    .tree .direct rect { stroke: var(--color-accent); }
-    .tree .indirect rect { stroke-dasharray: 6 4; }
-    .tree .indirect text { fill: var(--color-muted); }
-    .tree .bad rect { stroke: var(--color-danger); fill: var(--color-surface); }
-    .tree .bad text { fill: var(--color-danger); }
-    .tree .tag { font-family: var(--font-body); font-size: 18px; }
-    .tree .tag.accent { fill: var(--color-accent); }
-    .tree .tag.danger { fill: var(--color-danger); }
-    .tree .tag.muted { fill: var(--color-muted); }
-    .pair { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
-    .pt { padding: 16px 24px; border-radius: 12px; background: var(--color-surface); text-align: center; text-wrap: balance; }
-    .pt .num { font-weight: 500; }
+    .rows { display: flex; flex-direction: column; gap: 24px; margin-top: auto; }
+    .pt { padding: 28px 36px; border-radius: 12px; background: var(--color-surface); font-size: var(--text-h2); }
     .pt b { color: var(--color-danger); }
     .slide .lead { margin-top: auto; text-align: center; font-size: var(--text-h2); font-weight: 700; }
   </style>
 </head>
 <body class="slide">
-  <h1>なぜ npm が狙われる?</h1>
-  <svg class="tree" viewBox="0 0 1120 300" role="img" aria-label="1つのパッケージから多くのプロジェクトに広がる図">
-    <line x1="100" y1="62" x2="250" y2="128"/>
-    <line x1="284" y1="62" x2="250" y2="128"/>
-    <line x1="468" y1="62" x2="560" y2="128"/>
-    <line x1="652" y1="62" x2="560" y2="128"/>
-    <line x1="836" y1="62" x2="870" y2="128"/>
-    <line x1="1020" y1="62" x2="870" y2="128"/>
-    <line x1="250" y1="172" x2="560" y2="238"/>
-    <line x1="560" y1="172" x2="560" y2="238"/>
-    <line x1="870" y1="172" x2="560" y2="238"/>
-    <g><rect x="28" y="18" width="144" height="44" rx="8"/><text x="100" y="40">app-1</text></g>
-    <g><rect x="212" y="18" width="144" height="44" rx="8"/><text x="284" y="40">app-2</text></g>
-    <g><rect x="396" y="18" width="144" height="44" rx="8"/><text x="468" y="40">app-3</text></g>
-    <g><rect x="580" y="18" width="144" height="44" rx="8"/><text x="652" y="40">app-4</text></g>
-    <g><rect x="764" y="18" width="144" height="44" rx="8"/><text x="836" y="40">app-5</text></g>
-    <g><rect x="948" y="18" width="144" height="44" rx="8"/><text x="1020" y="40">app-6</text></g>
-    <g class="indirect"><rect x="170" y="128" width="160" height="44" rx="8"/><text x="250" y="150">pkg-a</text></g>
-    <g class="indirect"><rect x="480" y="128" width="160" height="44" rx="8"/><text x="560" y="150">pkg-c</text></g>
-    <g class="indirect"><rect x="790" y="128" width="160" height="44" rx="8"/><text x="870" y="150">pkg-d</text></g>
-    <g class="bad"><rect x="480" y="238" width="160" height="44" rx="8"/><text x="560" y="260">pkg-f</text></g>
-    <text class="tag danger" x="740" y="260">← 1つ乗っ取るだけ</text>
-  </svg>
-  <div class="pair">
-    <div class="pt">依存が多く、<b><span class="num">1</span>つ乗っ取れば広がる</b></div>
-    <div class="pt">盗んだ認証情報で、<b>次のパッケージも乗っ取れる</b></div>
+  <h1>なぜ npm が狙われる？</h1>
+  <div class="rows">
+    <div class="pt">乗っ取った package に依存する package へと<b>広がっていく</b></div>
+    <div class="pt">機微情報を盗みながら、<b>次の package の乗っ取りに繋げられる</b></div>
   </div>
-  <p class="lead">攻撃する側にとっても<strong>割がいい</strong></p>
+  <p class="lead">攻撃する側にとって<strong>割がいい</strong></p>
   <aside class="notes">
     では、なぜ npm がこんなに狙われるのか。攻撃する側の目線で考えてみます。まず、パッケージを1つ乗っ取るだけで、推移的依存をたどって、何千、何万というプロジェクトに一気に届きます。次に、届く先は開発者の PC や CI です。そこには、クラウドの鍵や npm のトークンが置いてあることが多い。それを盗めば、今度はそのトークンで別のパッケージを乗っ取れます。keyv の件では、この連鎖で、最初は十数個だったパッケージが、4時間足らずで444パッケージ、2,212バージョンまで広がりました。少ない手間で、大きな見返りが得られる。使う側にとって便利な仕組みは、攻撃する側にとっても割がいいんです。
   </aside>
