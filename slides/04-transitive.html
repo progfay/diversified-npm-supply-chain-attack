@@ -26,46 +26,52 @@
     .slide p { margin: 0; text-wrap: pretty; }
     .slide code { font-family: var(--font-mono); }
     .slide strong { color: var(--color-accent); }
-    .chain {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      font-family: var(--font-mono);
-      font-size: var(--text-muted);
-    }
-    .chain .pkg {
-      padding: 12px 16px;
-      border: 2px solid var(--color-line);
-      border-radius: 10px;
-      background: var(--color-surface);
-      white-space: nowrap;
-    }
-    .chain .mine { border-color: var(--color-accent); }
-    .chain .bad { border-color: var(--color-danger); color: var(--color-danger); }
-    .chain .arrow { color: var(--color-muted); }
-    .labels {
-      display: flex;
-      justify-content: space-between;
-      font-size: var(--text-muted);
-    }
-    .labels .mine { color: var(--color-accent); }
-    .labels .bad { color: var(--color-danger); }
+    .tree { width: auto; height: 300px; display: block; margin: 0 auto; }
+    .tree line { stroke: var(--color-line); stroke-width: 2; }
+    .tree rect { fill: var(--color-surface); stroke: var(--color-line); stroke-width: 2; }
+    .tree text { fill: var(--color-ink); font-family: var(--font-mono); font-size: 20px; text-anchor: middle; dominant-baseline: central; }
+    .tree .self rect { stroke: var(--color-accent); }
+    .tree .self text { fill: var(--color-accent); }
+    .tree .direct rect { stroke: var(--color-accent); }
+    .tree .indirect rect { stroke-dasharray: 6 4; }
+    .tree .indirect text { fill: var(--color-muted); }
+    .tree .bad rect { stroke: var(--color-danger); fill: var(--color-surface); }
+    .tree .bad text { fill: var(--color-danger); }
+    .tree .tag { font-family: var(--font-body); font-size: 18px; }
+    .tree .tag.accent { fill: var(--color-accent); }
+    .tree .tag.danger { fill: var(--color-danger); }
+    .tree .tag.muted { fill: var(--color-muted); }
     .figure { display: flex; flex-direction: column; gap: 16px; }
+    .legend { display: flex; justify-content: center; gap: 48px; font-size: var(--text-muted); }
+    .legend .direct { color: var(--color-accent); }
+    .legend .indirect { color: var(--color-muted); }
   </style>
 </head>
 <body class="slide">
   <h1>自分で入れていないパッケージも動く</h1>
   <div class="figure">
-    <div class="chain">
-      <span class="pkg mine">eslint</span><span class="arrow">→</span>
-      <span class="pkg">file-entry-cache</span><span class="arrow">→</span>
-      <span class="pkg">flat-cache</span><span class="arrow">→</span>
-      <span class="pkg bad">cacheable</span><span class="arrow">→</span>
-      <span class="pkg bad">keyv</span>
-    </div>
-    <div class="labels">
-      <span class="mine">↑ 自分で入れたのはこれだけ</span>
-      <span class="bad">2026年8月に乗っ取られた ↑</span>
+    <svg class="tree" viewBox="0 0 1120 350" role="img" aria-label="サンプルの依存木">
+      <line x1="560" y1="50" x2="330" y2="102"/>
+      <line x1="560" y1="50" x2="790" y2="102"/>
+      <line x1="330" y1="146" x2="200" y2="198"/>
+      <line x1="330" y1="146" x2="460" y2="198"/>
+      <line x1="790" y1="146" x2="790" y2="198"/>
+      <line x1="200" y1="242" x2="200" y2="294"/>
+      <line x1="790" y1="242" x2="660" y2="294"/>
+      <line x1="790" y1="242" x2="920" y2="294"/>
+      <g class="self"><rect x="480" y="6" width="160" height="44" rx="8"/><text x="560" y="28">my-app</text></g>
+      <g class="direct"><rect x="250" y="102" width="160" height="44" rx="8"/><text x="330" y="124">pkg-a</text></g>
+      <g class="direct"><rect x="710" y="102" width="160" height="44" rx="8"/><text x="790" y="124">pkg-b</text></g>
+      <g class="indirect"><rect x="120" y="198" width="160" height="44" rx="8"/><text x="200" y="220">pkg-c</text></g>
+      <g class="indirect"><rect x="380" y="198" width="160" height="44" rx="8"/><text x="460" y="220">pkg-d</text></g>
+      <g class="indirect"><rect x="710" y="198" width="160" height="44" rx="8"/><text x="790" y="220">pkg-e</text></g>
+      <g class="bad indirect"><rect x="120" y="294" width="160" height="44" rx="8"/><text x="200" y="316">pkg-f</text></g>
+      <g class="indirect"><rect x="580" y="294" width="160" height="44" rx="8"/><text x="660" y="316">pkg-g</text></g>
+      <g class="indirect"><rect x="840" y="294" width="160" height="44" rx="8"/><text x="920" y="316">pkg-h</text></g>
+    </svg>
+    <div class="legend">
+      <span class="direct">▭ 自分で入れた</span>
+      <span class="indirect">┅ 自分で入れていない</span>
     </div>
   </div>
   <p>依存の依存の、そのまた依存まで、<strong>すべてが自分の環境で動く</strong></p>

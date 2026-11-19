@@ -27,41 +27,27 @@
     .slide code { font-family: var(--font-mono); }
     .slide strong { color: var(--color-accent); }
     .case {
-      display: grid;
-      grid-template-columns: auto 1fr;
-      gap: 48px;
-      align-items: center;
-      padding: 32px 40px;
+      padding: 28px 36px;
       border-radius: 12px;
       background: var(--color-surface);
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
     }
-    .big {
-      font-family: var(--font-display);
-      font-size: var(--text-title);
-      font-weight: 700;
-      color: var(--color-danger);
-      line-height: 1.1;
+    .case .muted { color: var(--color-muted); }
+    .slide .punch {
+      margin-top: auto;
       text-align: center;
+      font-size: var(--text-h2);
+      font-weight: 700;
     }
-    .big small {
-      display: block;
-      font-size: var(--text-muted);
-      color: var(--color-muted);
-      font-weight: 400;
-    }
-    .case p { font-size: var(--text-body); }
-    .case .name { font-weight: 700; }
-    .punch { font-size: var(--text-h2); font-weight: 700; }
   </style>
 </head>
 <body class="slide">
   <h1>Minimum Release Age は誰かが気付く前提</h1>
   <div class="case">
-    <div class="big">8.6万回<small>2か月以上気付かれず</small></div>
-    <div>
-      <p class="name">PhantomRaven(2025年)</p>
-      <p>パッケージ本体は空っぽ。悪意あるコードは npm の外から取ってくるので、検査をすり抜けた</p>
-    </div>
+    <p><b>PhantomRaven(2025年)</b>: 2か月以上気付かれず、8.6万回インストールされた</p>
+    <p class="muted">パッケージ本体は空っぽ。悪意あるコードは npm の外から取ってくるので、検査をすり抜けた</p>
   </div>
   <p class="punch">誰も気付かなければ、<strong>何日待っても防げない</strong></p>
   <aside class="notes">
