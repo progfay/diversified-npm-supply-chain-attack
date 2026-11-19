@@ -2,7 +2,7 @@
 <html lang="ja">
 <head>
   <meta charset="utf-8">
-  <title>Minimum Release Age は誰かが気付く前提</title>
+  <title>誰も気付かなかったら？</title>
   <link rel="stylesheet" href="../design-system/system.css">
   <style>
     .slide {
@@ -44,14 +44,14 @@
   </style>
 </head>
 <body class="slide">
-  <h1>Minimum Release Age は誰かが気付く前提</h1>
+  <h1>誰も気付かなかったら？</h1>
   <div class="case">
     <p><b>PhantomRaven(2025年)</b>: 2か月以上気付かれなかった</p>
     <p class="muted">パッケージ本体は空っぽ。悪意あるコードは npm の外から取ってくるので、検査をすり抜けた</p>
   </div>
   <p class="punch">誰も気付かなければ、<strong>何日待っても防げない</strong></p>
   <aside class="notes">
-    次に Minimum Release Age です。pnpm のドキュメントにも、悪意あるリリースの多くは1時間以内に見つかって消される、と書かれています。つまりこれは、誰かが気付いて消してくれる、という前提の上に成り立っていて、その時間だけ待つ仕組みです。では、誰も気付かなかったらどうなるか。2025年の PhantomRaven では、2か月以上気付かれず、8.6万回インストールされました。パッケージ本体は空っぽで、悪意あるコードはインストールのときに npm の外のサーバーから取ってくる作りでした。スキャナーから見ると依存は0で、検査をすり抜けたんです。誰も気付かなければ、何日待っても防げません。
+    では、誰も気付かなかったらどうなるか。2025年の PhantomRaven では、2か月以上気付かれず、8.6万回インストールされました。パッケージ本体は空っぽで、悪意あるコードはインストールのときに npm の外のサーバーから取ってくる作りでした。監視する側から見ると依存は0で、検査をすり抜けたんです。誰も気付かなければ、何日待っても防げません。
   </aside>
 </body>
 </html>

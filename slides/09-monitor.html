@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <title>Minimum Release Age は誰かが気付く前提</title>
+  <link rel="stylesheet" href="../design-system/system.css">
+  <style>
+    .slide {
+      display: flex;
+      flex-direction: column;
+      gap: 40px;
+      padding: var(--space-page);
+      background: var(--color-bg);
+      color: var(--color-ink);
+      font-family: var(--font-body);
+      font-size: var(--text-body);
+      line-height: 1.7;
+    }
+    .slide h1 {
+      font-family: var(--font-display);
+      font-size: var(--text-h1);
+      font-weight: 700;
+      line-height: 1.3;
+      margin: 0;
+    }
+    .slide p { margin: 0; text-wrap: pretty; }
+    .slide code { font-family: var(--font-mono); }
+    .slide strong { color: var(--color-accent); }
+    .rows { display: flex; flex-direction: column; gap: 16px; }
+    .row {
+      display: grid;
+      grid-template-columns: 380px 1fr;
+      gap: 24px;
+      align-items: center;
+      padding: 18px 28px;
+      border-radius: 12px;
+      background: var(--color-surface);
+    }
+    .row b { color: var(--color-accent); font-size: var(--text-body); }
+    .row span { font-size: var(--text-muted); color: var(--color-muted); }
+    .slide .lead { margin-top: auto; text-align: center; font-size: var(--text-h2); font-weight: 700; }
+  </style>
+</head>
+<body class="slide">
+  <h1>Minimum Release Age は誰かが気付く前提</h1>
+  <div class="rows">
+    <div class="row"><b>セキュリティ企業の自動監視</b><span>新しく公開されたバージョンを自動で検査する(chalk / debug は Aikido が検知)</span></div>
+    <div class="row"><b>メンテナや利用者の報告</b><span>異変に気付いた人が報告する</span></div>
+    <div class="row"><b>悪意あるバージョンの取り下げ</b><span>報告を受けて取り下げられる(AsyncAPI は約4時間)</span></div>
+  </div>
+  <p class="lead">その間だけ<strong>待つ</strong>のが Minimum Release Age</p>
+  <aside class="notes">
+    次に Minimum Release Age です。これは、誰かが気付いて消してくれる、という前提の上に成り立っています。では、その誰かとは誰でしょう。今は、セキュリティ企業が、新しく公開されたバージョンを自動で検査しています。chalk や debug のときは、Aikido の監視が見つけました。メンテナ本人や利用者が気付いて報告することもあります。報告されると、悪意あるバージョンは取り下げられます。AsyncAPI は、公開から約4時間で取り下げられました。pnpm のドキュメントにも、悪意あるリリースの多くは1時間以内に見つかって消される、と書かれています。その間だけ待つのが、Minimum Release Age です。
+  </aside>
+</body>
+</html>
