@@ -23,18 +23,49 @@
       line-height: 1.3;
       margin: 0;
     }
-    .slide code {
-      font-family: var(--font-mono);
+    .slide p { margin: 0; text-wrap: pretty; }
+    .slide code { font-family: var(--font-mono); }
+    .slide strong { color: var(--color-accent); }
+    .lead { font-size: var(--text-body); }
+    .cols {
+      display: grid;
+      grid-template-columns: 2fr 3fr;
+      gap: 32px;
     }
+    .col {
+      padding: 24px 28px;
+      border-radius: 12px;
+      background: var(--color-surface);
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .col h2 {
+      font-family: var(--font-display);
+      font-size: var(--text-h2);
+      margin: 0;
+    }
+    .ok h2 { color: var(--color-success); }
+    .ng h2 { color: var(--color-danger); }
+    .col .ex { font-size: var(--text-muted); }
+    .col .ex b { color: var(--color-ink); }
+    .muted { color: var(--color-muted); }
   </style>
 </head>
 <body class="slide">
   <h1>postinstall を止めても、コードは動く</h1>
-  <ul>
-    <li>悪意あるコードは、パッケージを <code>require</code> / <code>import</code> した時点でも動かせる</li>
-    <li>node-ipc(2026年5月): <code>require</code> しただけで、クラウドの鍵・SSH 鍵・GitHub のトークンなどを盗む</li>
-    <li>AsyncAPI(2026年7月): 読み込むと、PC を外から遠隔操作できるマルウェアを仕込む</li>
-  </ul>
+  <p class="lead">悪意あるコードは、パッケージを <code>require</code> / <code>import</code> した時点でも<strong>動かせる</strong></p>
+  <div class="cols">
+    <section class="col ok">
+      <h2>✅ インストール時</h2>
+      <p class="muted">postinstall のブロックで止まる</p>
+    </section>
+    <section class="col ng">
+      <h2>❌ 読み込み時</h2>
+      <p class="ex"><b>node-ipc(2026年5月)</b>: <code>require</code> しただけで、クラウドの鍵・SSH 鍵・GitHub のトークンなどを盗む</p>
+      <p class="ex"><b>AsyncAPI(2026年7月)</b>: 読み込むと、PC を外から遠隔操作できるマルウェアを仕込む</p>
+    </section>
+  </div>
   <aside class="notes">
     まず postinstall のブロックです。止められるのは、インストールのときに動くスクリプトだけです。でも、悪意あるコードは、パッケージを require や import した時点でも動かせます。1つめの例では、悪意あるバージョンを require しただけで、クラウドの鍵や SSH 鍵、GitHub のトークンなどが集められて、外に送られていました。2つめの例では、読み込むと、PC を外から遠隔操作できるマルウェアが仕込まれました。ブラウザに保存したパスワードや Cookie まで狙うものです。どちらも postinstall を使っていないので、ブロックしていても止まりません。
   </aside>

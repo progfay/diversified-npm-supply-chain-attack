@@ -23,15 +23,46 @@
       line-height: 1.3;
       margin: 0;
     }
+    .slide p { margin: 0; text-wrap: pretty; }
+    .slide code { font-family: var(--font-mono); }
+    .slide strong { color: var(--color-accent); }
+    .cols {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 24px;
+    }
+    .col {
+      padding: 28px 32px;
+      border-radius: 12px;
+      background: var(--color-surface);
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+    .col h2 {
+      font-family: var(--font-display);
+      font-size: var(--text-h2);
+      margin: 0;
+    }
+    .good h2 { color: var(--color-success); }
+    .bad h2 { color: var(--color-warning); }
   </style>
 </head>
 <body class="slide">
   <h1>もしくは、自作する?</h1>
-  <ul>
-    <li>小さな処理なら、依存(= 信頼する相手)を1つ減らせる</li>
-    <li>自分のコードとして、レビューやスキャンの対象にできる</li>
-    <li>ただし、自作したコードが新たな脆弱性を生むこともある</li>
-  </ul>
+  <div class="cols">
+    <section class="col good">
+      <h2>👍 嬉しいこと</h2>
+      <ul>
+        <li>小さな処理なら、依存(= 信頼する相手)を1つ減らせる</li>
+        <li>自分のコードとして、レビューやスキャンの対象にできる</li>
+      </ul>
+    </section>
+    <section class="col bad">
+      <h2>⚠️ ただし</h2>
+      <p>自作したコードが新たな脆弱性を生むこともある</p>
+    </section>
+  </div>
   <aside class="notes">
     もしくは、自作するという手もあります。小さな処理なら、依存を、つまり信頼する相手を1つ減らせますし、自分のコードとしてレビューやスキャンの対象にできます。ただ、自作したコードが新たな脆弱性を生むこともあるので、何でも自作すればいいわけではありません。
   </aside>

@@ -23,14 +23,52 @@
       line-height: 1.3;
       margin: 0;
     }
+    .slide p { margin: 0; text-wrap: pretty; }
+    .slide code { font-family: var(--font-mono); }
+    .slide strong { color: var(--color-accent); }
+    .chain {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-family: var(--font-mono);
+      font-size: var(--text-muted);
+    }
+    .chain .pkg {
+      padding: 12px 16px;
+      border: 2px solid var(--color-line);
+      border-radius: 10px;
+      background: var(--color-surface);
+      white-space: nowrap;
+    }
+    .chain .mine { border-color: var(--color-accent); }
+    .chain .bad { border-color: var(--color-danger); color: var(--color-danger); }
+    .chain .arrow { color: var(--color-muted); }
+    .labels {
+      display: flex;
+      justify-content: space-between;
+      font-size: var(--text-muted);
+    }
+    .labels .mine { color: var(--color-accent); }
+    .labels .bad { color: var(--color-danger); }
+    .figure { display: flex; flex-direction: column; gap: 16px; }
   </style>
 </head>
 <body class="slide">
   <h1>自分で入れていないパッケージも動く</h1>
-  <ul>
-    <li>eslint を入れると、その先で cacheable や keyv も入る</li>
-    <li>依存の依存の、そのまた依存まで、すべてが自分の環境で動く</li>
-  </ul>
+  <div class="figure">
+    <div class="chain">
+      <span class="pkg mine">eslint</span><span class="arrow">→</span>
+      <span class="pkg">file-entry-cache</span><span class="arrow">→</span>
+      <span class="pkg">flat-cache</span><span class="arrow">→</span>
+      <span class="pkg bad">cacheable</span><span class="arrow">→</span>
+      <span class="pkg bad">keyv</span>
+    </div>
+    <div class="labels">
+      <span class="mine">↑ 自分で入れたのはこれだけ</span>
+      <span class="bad">2026年8月に乗っ取られた ↑</span>
+    </div>
+  </div>
+  <p>依存の依存の、そのまた依存まで、<strong>すべてが自分の環境で動く</strong></p>
   <aside class="notes">
     しかも、動くのは自分で入れたパッケージだけではありません。たとえば今の依存関係だと、eslint を入れると、その依存の file-entry-cache、さらにその先の flat-cache、cacheable、そして keyv までが一緒に入ってきます。この cacheable と keyv は、2026年8月に実際に乗っ取られたパッケージです。eslint しか入れていないつもりでも、依存の依存の、そのまた依存まで、すべてが自分の環境で動きます。こうして間接的に入ってくる依存を、推移的依存と呼びます。
   </aside>
