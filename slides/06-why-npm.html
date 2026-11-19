@@ -41,9 +41,11 @@
     .tree .tag.accent { fill: var(--color-accent); }
     .tree .tag.danger { fill: var(--color-danger); }
     .tree .tag.muted { fill: var(--color-muted); }
-    .rows { display: flex; flex-direction: column; gap: 8px; }
-    .loop { color: var(--color-danger); }
-    .punch { font-size: var(--text-h2); font-weight: 700; }
+    .pair { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+    .pt { padding: 16px 24px; border-radius: 12px; background: var(--color-surface); text-align: center; text-wrap: balance; }
+    .pt .num { font-weight: 500; }
+    .pt b { color: var(--color-danger); }
+    .slide .lead { margin-top: auto; text-align: center; font-size: var(--text-h2); font-weight: 700; }
   </style>
 </head>
 <body class="slide">
@@ -70,11 +72,11 @@
     <g class="bad"><rect x="480" y="238" width="160" height="44" rx="8"/><text x="560" y="260">pkg-f</text></g>
     <text class="tag danger" x="740" y="260">← 1つ乗っ取るだけ</text>
   </svg>
-  <div class="rows">
-    <p>依存が多く、1つ乗っ取れば広がる</p>
-    <p class="loop">↺ 盗んだ認証情報が、次の攻撃の足場になる</p>
-    <p class="punch">攻撃する側にとっても<strong>割がいい</strong></p>
+  <div class="pair">
+    <div class="pt">依存が多く、<b><span class="num">1</span>つ乗っ取れば広がる</b></div>
+    <div class="pt">盗んだ認証情報で、<b>次のパッケージも乗っ取れる</b></div>
   </div>
+  <p class="lead">攻撃する側にとっても<strong>割がいい</strong></p>
   <aside class="notes">
     では、なぜ npm がこんなに狙われるのか。攻撃する側の目線で考えてみます。まず、パッケージを1つ乗っ取るだけで、推移的依存をたどって、何千、何万というプロジェクトに一気に届きます。次に、届く先は開発者の PC や CI です。そこには、クラウドの鍵や npm のトークンが置いてあることが多い。それを盗めば、今度はそのトークンで別のパッケージを乗っ取れます。keyv の件では、この連鎖で、最初は十数個だったパッケージが、4時間足らずで444パッケージ、2,212バージョンまで広がりました。少ない手間で、大きな見返りが得られる。使う側にとって便利な仕組みは、攻撃する側にとっても割がいいんです。
   </aside>

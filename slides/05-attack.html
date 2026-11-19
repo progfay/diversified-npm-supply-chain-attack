@@ -26,7 +26,7 @@
     .slide p { margin: 0; text-wrap: pretty; }
     .slide code { font-family: var(--font-mono); }
     .slide strong { color: var(--color-accent); }
-    .tree { width: auto; height: 380px; display: block; margin: 0 auto; }
+    .tree { width: auto; height: 380px; flex-shrink: 0; display: block; margin: 0 auto; }
     .tree line { stroke: var(--color-line); stroke-width: 2; }
     .tree rect { fill: var(--color-surface); stroke: var(--color-line); stroke-width: 2; }
     .tree text { fill: var(--color-ink); font-family: var(--font-mono); font-size: 22px; text-anchor: middle; dominant-baseline: central; }
@@ -43,6 +43,7 @@
     .tree .legend.direct { fill: var(--color-accent); }
     .tree .legend.indirect { fill: var(--color-muted); }
     .slide .lead { margin-top: auto; text-align: center; font-size: var(--text-h2); font-weight: 700; }
+    .lead .num { font-weight: 500; }
   </style>
 </head>
 <body class="slide">
@@ -68,7 +69,7 @@
       <g class=""><rect x="580" y="306" width="160" height="44" rx="8"/></g>
       <g class=""><rect x="840" y="306" width="160" height="44" rx="8"/></g>
     </svg>
-  <p class="lead">攻撃者は、<strong>どれか1つを乗っ取るだけでいい</strong></p>
+  <p class="lead">攻撃者は<strong>どれか<span class="num">1</span>つを乗っ取るだけでいい</strong></p>
   <aside class="notes">
     ここで、この木のどこか、たとえば末端のパッケージが1つ乗っ取られたとします。悪意あるバージョンが公開されると、依存をたどって、そのまま自分の環境に入ってきて、自分のプロジェクトの中で動いてしまいます。攻撃者は、この木のどれか1つを乗っ取るだけでいいんです。これがサプライチェーン攻撃です。
   </aside>

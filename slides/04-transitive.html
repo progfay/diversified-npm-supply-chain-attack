@@ -26,7 +26,7 @@
     .slide p { margin: 0; text-wrap: pretty; }
     .slide code { font-family: var(--font-mono); }
     .slide strong { color: var(--color-accent); }
-    .tree { width: auto; height: 380px; display: block; margin: 0 auto; }
+    .tree { width: auto; height: 380px; flex-shrink: 0; display: block; margin: 0 auto; }
     .tree line { stroke: var(--color-line); stroke-width: 2; }
     .tree rect { fill: var(--color-surface); stroke: var(--color-line); stroke-width: 2; }
     .tree text { fill: var(--color-ink); font-family: var(--font-mono); font-size: 22px; text-anchor: middle; dominant-baseline: central; }
@@ -35,7 +35,7 @@
     .tree .self rect { stroke: var(--color-accent); }
     .tree .self text { fill: var(--color-accent); }
     .tree .direct rect { stroke: var(--color-accent); }
-    .tree .indirect rect { stroke-dasharray: 6 4; }
+    .tree .indirect rect { stroke: var(--color-line); }
     .tree .bad rect { stroke: var(--color-danger); }
     .tree line.hot { stroke: var(--color-danger); stroke-width: 3; }
     .tree .skull { font-family: var(--font-body); font-size: 26px; }
@@ -50,8 +50,8 @@
     <svg class="tree" viewBox="0 0 1120 370" role="img" aria-label="依存木">
       <rect class="region" x="100" y="100" width="920" height="262" rx="16"/>
       <text class="region-label" x="116" y="86">node_modules</text>
-      <text class="legend direct" x="1010" y="28">実線: 自分で入れた</text>
-      <text class="legend indirect" x="1010" y="60">点線: 自分で入れていない</text>
+      <text class="legend direct" x="1010" y="28">青: 自分で入れた</text>
+      <text class="legend indirect" x="1010" y="60">灰: 自分で入れていない</text>
       <line x1="560" y1="62" x2="330" y2="114"/>
       <line x1="560" y1="62" x2="790" y2="114"/>
       <line x1="330" y1="158" x2="200" y2="210"/>

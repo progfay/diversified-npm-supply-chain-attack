@@ -2,7 +2,7 @@
 <html lang="ja">
 <head>
   <meta charset="utf-8">
-  <title>postinstall を止めても、コードは動く</title>
+  <title>postinstall を止めても、コードは入る</title>
   <link rel="stylesheet" href="../design-system/system.css">
   <style>
     .slide {
@@ -61,17 +61,16 @@
   </style>
 </head>
 <body class="slide">
-  <h1>postinstall を止めても、コードは動く</h1>
-  <p class="lead">悪意あるコードは、パッケージを <code>require</code> / <code>import</code> した時点でも<strong>動かせる</strong></p>
+  <h1>postinstall を止めても、コードは入る</h1>
   <div class="timeline">
     <section class="phase ok">
       <span class="cmd">npm install</span>
-      <p class="what">postinstall が動く</p>
-      <p class="result">✅ ブロックで止められる</p>
+      <p class="what">preinstall / postinstall が実行</p>
+      <p class="result">✅ ブロックできる</p>
     </section>
     <section class="phase ng">
       <span class="cmd">npm start</span>
-      <p class="what">パッケージが <code>import</code> される</p>
+      <p class="what"><code>import "compromised-pkg"</code> が実行</p>
       <p class="result">❌ 止められない</p>
       <p class="ex"><b>node-ipc(2026年5月)</b>: <code>require</code> しただけで、クラウドの鍵・SSH 鍵・GitHub のトークンなどを盗む</p>
       <p class="ex"><b>AsyncAPI(2026年7月)</b>: 読み込むと、PC を外から遠隔操作できるマルウェアを仕込む</p>
