@@ -2,7 +2,7 @@
 <html lang="ja">
 <head>
   <meta charset="utf-8">
-  <title>被害を受けにくくする</title>
+  <title>「信頼」できる package とは</title>
   <link rel="stylesheet" href="../design-system/system.css">
   <style>
     .slide {
@@ -32,41 +32,28 @@
       align-items: center;
       gap: 16px;
       text-align: center;
+      margin-top: auto;
     }
     .actor { display: flex; flex-direction: column; align-items: center; gap: 8px; }
-    .actor .icon { font-size: 64px; line-height: 1; }
+    .actor .icon { font-size: 80px; line-height: 1; }
     .actor .name { font-size: var(--text-muted); color: var(--color-muted); }
     .link { display: flex; flex-direction: column; align-items: center; color: var(--color-accent); font-size: var(--text-muted); }
     .link .arrow { font-size: var(--text-h2); line-height: 1; }
-    .attack {
-      display: grid;
-      grid-template-columns: 1fr auto 1fr auto 1fr;
-      gap: 16px;
-      text-align: center;
-      align-items: center;
-    }
-    .attack .hit { grid-column: 5; display: flex; flex-direction: column; align-items: center; gap: 4px; color: var(--color-danger); }
-    .attack .hit .icon { font-size: 48px; line-height: 1; }
-    .attack .hit small { font-size: var(--text-muted); }
-    .attack .hit .ex { color: var(--color-muted); }
-    .slide .bottom { margin-top: auto; text-align: center; font-size: var(--text-h2); font-weight: 700; }
+    .slide .lead { margin-top: auto; text-align: center; font-size: var(--text-h2); font-weight: 700; }
   </style>
 </head>
 <body class="slide">
-  <h1>被害を受けにくくする</h1>
+  <h1>「信頼」できる package とは</h1>
   <div class="scene">
     <div class="actor"><span class="icon">🧑‍💻</span><span class="name">あなた</span></div>
-    <div class="link"><span>信頼する</span><span class="arrow">→</span></div>
-    <div class="actor"><span class="icon">📦</span><span class="name">依存パッケージ</span></div>
-    <div class="link"><span>公開</span><span class="arrow">←</span></div>
+    <div class="link"><span>インストール</span><span class="arrow">←</span></div>
+    <div class="actor"><span class="icon">📦</span><span class="name">npm のパッケージ</span></div>
+    <div class="link"><span>アカウントで公開</span><span class="arrow">←</span></div>
     <div class="actor"><span class="icon">🧑‍🔧</span><span class="name">公開者</span></div>
   </div>
-  <div class="attack">
-    <div class="hit"><span class="icon">🥷</span><small>↑ アカウントを乗っ取られれば同じ</small><small class="ex">node-ipc、keyv</small></div>
-  </div>
-  <p class="bottom">信頼に足るかを見分ける<strong>確かな方法はない</strong></p>
+  <p class="lead">依存を1つ入れる = <strong>その公開者を信頼すること</strong></p>
   <aside class="notes">
-    依存を1つ入れるというのは、そのパッケージを公開している人を信頼する、ということです。でも、信頼できる人のパッケージでも、アカウントを乗っ取られれば同じです。node-ipc は、期限切れになったメンテナのメールドメインを取られて、アカウントを復旧された可能性が指摘されています。keyv は、メンテナの GitHub アカウントそのものが乗っ取られました。正直に言うと、信頼に足るかを見分ける確かな方法は、私もまだ答えを持っていません。
+    では、信頼できるパッケージとは何でしょう。パッケージは、メンテナが自分のアカウントで npm に公開して、私たちはそれをインストールします。つまり、依存を1つ入れるというのは、コードそのものというより、それを公開している人と、そのアカウントを信頼する、ということです。
   </aside>
 </body>
 </html>

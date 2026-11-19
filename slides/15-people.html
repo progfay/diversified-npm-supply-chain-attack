@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <title>狙われるのは、人とアカウント</title>
+  <link rel="stylesheet" href="../design-system/system.css">
+  <style>
+    .slide {
+      display: flex;
+      flex-direction: column;
+      gap: 40px;
+      padding: var(--space-page);
+      background: var(--color-bg);
+      color: var(--color-ink);
+      font-family: var(--font-body);
+      font-size: var(--text-body);
+      line-height: 1.7;
+    }
+    .slide h1 {
+      font-family: var(--font-display);
+      font-size: var(--text-h1);
+      font-weight: 700;
+      line-height: 1.3;
+      margin: 0;
+    }
+    .slide p { margin: 0; text-wrap: pretty; }
+    .slide code { font-family: var(--font-mono); }
+    .slide strong { color: var(--color-accent); }
+    .rows { display: flex; flex-direction: column; gap: 16px; }
+    .row {
+      display: grid;
+      grid-template-columns: 240px 1fr;
+      gap: 24px;
+      align-items: center;
+      padding: 18px 28px;
+      border-radius: 12px;
+      background: var(--color-surface);
+    }
+    .row b { font-family: var(--font-mono); color: var(--color-danger); }
+    .row span { font-size: var(--text-body); }
+    .slide .lead { margin-top: auto; text-align: center; font-size: var(--text-h2); font-weight: 700; }
+  </style>
+</head>
+<body class="slide">
+  <h1>狙われるのは、人とアカウント</h1>
+  <div class="rows">
+    <div class="row"><b>node-ipc</b><span>期限切れのメールドメインを取られ、アカウントを復旧された可能性</span></div>
+    <div class="row"><b>keyv</b><span>メンテナの GitHub アカウントが乗っ取られた</span></div>
+    <div class="row"><b>chalk / debug</b><span>メンテナがフィッシングメールに引っかかった</span></div>
+  </div>
+  <p class="lead">どの package も、<strong>絶対に安全という保証はない</strong></p>
+  <aside class="notes">
+    では、その人やアカウントは安全でしょうか。node-ipc では、期限切れになったメンテナのメールドメインを第三者に取られて、パスワードリセットでアカウントを復旧された可能性が指摘されています。keyv では、メンテナの GitHub アカウントそのものが乗っ取られました。chalk や debug では、メンテナが npm を装ったフィッシングメールに引っかかりました。どれも、多くの人に信頼されていた人気のパッケージです。人はミスをしますし、アカウントは狙われます。正直に言うと、信頼に足るかを見分ける確かな方法は、私もまだ答えを持っていません。どのパッケージも、絶対に安全という保証はないんです。
+  </aside>
+</body>
+</html>

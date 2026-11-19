@@ -26,28 +26,27 @@
     .slide p { margin: 0; text-wrap: pretty; }
     .slide code { font-family: var(--font-mono); }
     .slide strong { color: var(--color-accent); }
-    .tree { width: auto; height: 300px; display: block; margin: 0 auto; }
+    .tree { width: auto; height: 380px; display: block; margin: 0 auto; }
     .tree line { stroke: var(--color-line); stroke-width: 2; }
     .tree rect { fill: var(--color-surface); stroke: var(--color-line); stroke-width: 2; }
     .tree text { fill: var(--color-ink); font-family: var(--font-mono); font-size: 22px; text-anchor: middle; dominant-baseline: central; }
     .tree .region { fill: none; stroke: var(--color-muted); stroke-dasharray: 8 6; }
-    .tree .region-label { fill: var(--color-muted); font-size: 22px; text-anchor: start; }
+    .tree .region-label { fill: var(--color-muted); text-anchor: start; }
     .tree .self rect { stroke: var(--color-accent); }
     .tree .self text { fill: var(--color-accent); }
     .tree .direct rect { stroke: var(--color-accent); }
     .tree .indirect rect { stroke-dasharray: 6 4; }
     .tree .bad rect { stroke: var(--color-danger); }
-    .tree .bad text { fill: var(--color-danger); }
     .tree line.hot { stroke: var(--color-danger); stroke-width: 3; }
-    .tree .tag { font-family: var(--font-body); font-size: 22px; text-anchor: start; }
-    .tree .tag.danger { fill: var(--color-danger); }
-    .tree .tag.accent { fill: var(--color-accent); }
-    .figure { display: flex; flex-direction: column; gap: 16px; }
+    .tree .skull { font-family: var(--font-body); font-size: 26px; }
+    .tree .legend { font-family: var(--font-body); font-size: 20px; text-anchor: end; }
+    .tree .legend.direct { fill: var(--color-accent); }
+    .tree .legend.indirect { fill: var(--color-muted); }
+    .slide .lead { margin-top: auto; text-align: center; font-size: var(--text-h2); font-weight: 700; }
   </style>
 </head>
 <body class="slide">
   <h1>node_modules</h1>
-  <div class="figure">
     <svg class="tree" viewBox="0 0 1120 370" role="img" aria-label="依存木">
       <rect class="region" x="100" y="100" width="920" height="262" rx="16"/>
       <text class="region-label" x="116" y="86">node_modules</text>
@@ -69,8 +68,6 @@
       <g class=""><rect x="580" y="306" width="160" height="44" rx="8"/></g>
       <g class=""><rect x="840" y="306" width="160" height="44" rx="8"/></g>
     </svg>
-  </div>
-  <p>プロジェクトのコードの大半は、<strong>自分で書いていない</strong></p>
   <aside class="notes">
     皆さん、npm install や pnpm install は、毎日のようにしていると思います。インストールしたパッケージは node_modules に入ります。依存しているパッケージが、さらに別のパッケージに依存していて、こんな木の形になっています。プロジェクトのコードの大半は、実はこの node_modules の中にあって、自分では書いていません。
   </aside>

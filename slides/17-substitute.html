@@ -2,7 +2,7 @@
 <html lang="ja">
 <head>
   <meta charset="utf-8">
-  <title>すでに信頼しているもので代用できないか?</title>
+  <title>無理のない依存の減らし方</title>
   <link rel="stylesheet" href="../design-system/system.css">
   <style>
     .slide {
@@ -32,32 +32,40 @@
       gap: 32px;
     }
     .card {
-      padding: 32px;
+      position: relative;
+      overflow: hidden;
+      padding: 36px 32px 32px;
       border-radius: 12px;
       background: var(--color-surface);
-      border-top: 4px solid var(--color-accent);
       display: flex;
       flex-direction: column;
       gap: 16px;
+    }
+    .card::before {
+      content: '';
+      position: absolute;
+      left: 0; right: 0; top: 0;
+      height: 4px;
+      background: var(--color-accent);
     }
     .card h2 { font-family: var(--font-display); font-size: var(--text-h2); margin: 0; }
     .card .ex { font-size: var(--text-muted); color: var(--color-muted); }
   </style>
 </head>
 <body class="slide">
-  <h1>すでに信頼しているもので代用できないか?</h1>
+  <h1>無理のない依存の減らし方</h1>
   <div class="cols">
     <section class="card">
       <h2>Node.js などの基盤の標準機能</h2>
       <p class="ex">例: chalk → <code>util.styleText</code><br>uuid → <code>crypto.randomUUID</code><br>throttle → <code>util.throttle</code><br>debounce → <code>util.debounce</code></p>
     </section>
     <section class="card">
-      <h2>Vite+ のような全部入り</h2>
-      <p class="ex">例: ビルド・テスト・lint などを1つにまとめて提供</p>
+      <h2>すでに install している package を使う</h2>
+      <p class="ex">例: 新しく足す前に、いまある依存で同じことができないか確かめる</p>
     </section>
   </div>
   <aside class="notes">
-    減らし方の1つが、すでに信頼しているもので代用することです。たとえば Node.js の標準機能。chalk の代わりに util.styleText、uuid の代わりに crypto.randomUUID、rimraf の代わりに fs.rm が使えます。最近は util.throttle も入りました。Node.js 自体はもう信頼して使っているので、信頼する相手は増えません。Vite+ のように、ツール一式をまとめて提供してくれるものに寄せるのも、同じ考え方です。
+    無理のない減らし方として、まず、すでにあるもので代用できないかを考えます。1つは Node.js などの基盤の標準機能です。chalk の代わりに util.styleText、uuid の代わりに crypto.randomUUID が使えますし、throttle や debounce も最近 util に入りました。もう1つは、すでにインストールしているパッケージを使うこと。新しく足す前に、いまある依存で同じことができないかを確かめます。どちらも、信頼する相手を増やさずに済みます。
   </aside>
 </body>
 </html>
