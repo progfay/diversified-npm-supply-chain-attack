@@ -222,8 +222,8 @@
 - 基調講演2「Yep, I've Been Pwned: What I Learned from Being Hacked」Josh Junon(19:20-19:50 / Track B / English)
   - https://jsconf.jp/2026/en/talks/josh-junon
   - chalk・debug・color のメンテナ。2025年9月の chalk / debug 事件(フィッシングでアカウントを乗っ取られた)の当事者
-  - 自分の LT(10:20)と同じスケジュールページに載っている(同じ日の夜の可能性が高い。日付は未確認)
-  - ユーザーは「勉強し続ける」の膨らませ方として、この話に触れるか検討中
+  - **決定: 「勉強し続ける」の締めで、このキーノートを紹介する**(Jxck・Jordan の講演に触れない方針とは別扱い)
+  - JSConf JP 2026 は 2026年11月22日(日)の1日開催 → LT(10:20)と同じ日の夜
 
 ---
 
