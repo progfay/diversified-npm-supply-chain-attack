@@ -2,7 +2,7 @@
 <html lang="ja">
 <head>
   <meta charset="utf-8">
-  <title>自分で入れていないパッケージも動く</title>
+  <title>Supply Chain Attack</title>
   <link rel="stylesheet" href="../design-system/system.css">
   <style>
     .slide {
@@ -35,7 +35,7 @@
     .tree .self rect { stroke: var(--color-accent); }
     .tree .self text { fill: var(--color-accent); }
     .tree .direct rect { stroke: var(--color-accent); }
-    .tree .indirect rect { stroke: var(--color-line); }
+    .tree .indirect rect { stroke-dasharray: 6 4; }
     .tree .bad rect { stroke: var(--color-danger); }
     .tree line.hot { stroke: var(--color-danger); stroke-width: 3; }
     .tree .skull { font-family: var(--font-body); font-size: 26px; }
@@ -43,36 +43,35 @@
     .tree .legend.direct { fill: var(--color-accent); }
     .tree .legend.indirect { fill: var(--color-muted); }
     .slide .lead { margin-top: auto; text-align: center; font-size: var(--text-h2); font-weight: 700; }
+    .lead .num { font-weight: 500; }
   </style>
 </head>
 <body class="slide">
-  <h1>自分で入れていないパッケージも動く</h1>
+  <h1>Supply Chain Attack</h1>
     <svg class="tree" viewBox="0 0 1120 370" role="img" aria-label="依存木">
       <rect class="region" x="100" y="100" width="920" height="262" rx="16"/>
       <text class="region-label" x="116" y="86">node_modules</text>
-      <text class="legend direct" x="1010" y="28">青: 自分で入れた</text>
-      <text class="legend indirect" x="1010" y="60">灰: 自分で入れていない</text>
-      <line x1="560" y1="62" x2="330" y2="114"/>
+      <line class="hot" x1="560" y1="62" x2="330" y2="114"/>
       <line x1="560" y1="62" x2="790" y2="114"/>
-      <line x1="330" y1="158" x2="200" y2="210"/>
+      <line class="hot" x1="330" y1="158" x2="200" y2="210"/>
       <line x1="330" y1="158" x2="460" y2="210"/>
       <line x1="790" y1="158" x2="790" y2="210"/>
-      <line x1="200" y1="254" x2="200" y2="306"/>
+      <line class="hot" x1="200" y1="254" x2="200" y2="306"/>
       <line x1="790" y1="254" x2="660" y2="306"/>
       <line x1="790" y1="254" x2="920" y2="306"/>
       <g class="self"><rect x="480" y="18" width="160" height="44" rx="8"/><text x="560" y="40">my-app</text></g>
-      <g class="direct"><rect x="250" y="114" width="160" height="44" rx="8"/></g>
-      <g class="direct"><rect x="710" y="114" width="160" height="44" rx="8"/></g>
-      <g class="indirect"><rect x="120" y="210" width="160" height="44" rx="8"/></g>
-      <g class="indirect"><rect x="380" y="210" width="160" height="44" rx="8"/></g>
-      <g class="indirect"><rect x="710" y="210" width="160" height="44" rx="8"/></g>
-      <g class="indirect"><rect x="120" y="306" width="160" height="44" rx="8"/></g>
-      <g class="indirect"><rect x="580" y="306" width="160" height="44" rx="8"/></g>
-      <g class="indirect"><rect x="840" y="306" width="160" height="44" rx="8"/></g>
+      <g class="bad"><rect x="250" y="114" width="160" height="44" rx="8"/></g>
+      <g class=""><rect x="710" y="114" width="160" height="44" rx="8"/></g>
+      <g class="bad"><rect x="120" y="210" width="160" height="44" rx="8"/></g>
+      <g class=""><rect x="380" y="210" width="160" height="44" rx="8"/></g>
+      <g class=""><rect x="710" y="210" width="160" height="44" rx="8"/></g>
+      <g class="bad"><rect x="120" y="306" width="160" height="44" rx="8"/><text class="skull" x="200" y="328">☠️</text></g>
+      <g class=""><rect x="580" y="306" width="160" height="44" rx="8"/></g>
+      <g class=""><rect x="840" y="306" width="160" height="44" rx="8"/></g>
     </svg>
-  <p class="lead">依存の依存の、そのまた依存まで、<strong>すべてが自分の環境で動く</strong></p>
+  <p class="lead">攻撃者は<strong>どれか<span class="num">1</span>つを乗っ取るだけでいい</strong></p>
   <aside class="notes">
-    この木のうち、自分で入れたのは、すぐ下の2つだけです。その先は、依存の依存の、そのまた依存です。たとえば今の依存関係だと、eslint を入れると、file-entry-cache、flat-cache、cacheable、そして keyv までが一緒に入ってきます。こうして間接的に入ってくる依存を、推移的依存と呼びます。自分で入れていないパッケージも、すべて自分の環境で動きます。
+    ここで、この木のどこか、たとえば末端のパッケージが1つ乗っ取られたとします。悪意あるバージョンが公開されると、依存をたどって、そのまま自分の環境に入ってきて、自分のプロジェクトの中で動いてしまいます。攻撃者は、この木のどれか1つを乗っ取るだけでいいんです。これがサプライチェーン攻撃です。
   </aside>
 </body>
 </html>

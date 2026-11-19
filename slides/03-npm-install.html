@@ -68,8 +68,9 @@
       <g class=""><rect x="580" y="306" width="160" height="44" rx="8"/></g>
       <g class=""><rect x="840" y="306" width="160" height="44" rx="8"/></g>
     </svg>
+  <p class="lead">依存もまた<strong>依存を持つ</strong></p>
   <aside class="notes">
-    皆さん、npm install や pnpm install は、毎日のようにしていると思います。インストールしたパッケージは node_modules に入ります。依存しているパッケージが、さらに別のパッケージに依存していて、こんな木の形になっています。プロジェクトのコードの大半は、実はこの node_modules の中にあって、自分では書いていません。
+    皆さん、npm install や pnpm install は、毎日のようにしていると思います。インストールしたパッケージは node_modules に入ります。自分が入れたパッケージも、また別のパッケージに依存していて、こんな木の形になっています。たとえば今の依存関係だと、eslint を入れると、file-entry-cache、flat-cache、cacheable、そして keyv までが一緒に入ってきます。プロジェクトのコードの大半は、実はこの node_modules の中にあって、自分では書いていません。
   </aside>
 </body>
 </html>
