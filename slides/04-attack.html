@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <title>サプライチェーン攻撃</title>
+  <link rel="stylesheet" href="../design-system/system.css">
+  <style>
+    .slide {
+      display: flex;
+      flex-direction: column;
+      gap: 40px;
+      padding: var(--space-page);
+      background: var(--color-bg);
+      color: var(--color-ink);
+      font-family: var(--font-body);
+      font-size: var(--text-body);
+      line-height: 1.7;
+    }
+    .slide h1 {
+      font-family: var(--font-display);
+      font-size: var(--text-h1);
+      font-weight: 700;
+      line-height: 1.3;
+      margin: 0;
+    }
+    .slide p { margin: 0; text-wrap: pretty; }
+    .slide code { font-family: var(--font-mono); }
+    .slide strong { color: var(--color-accent); }
+    .tree { width: auto; height: 300px; display: block; margin: 0 auto; }
+    .tree line { stroke: var(--color-line); stroke-width: 2; }
+    .tree rect { fill: var(--color-surface); stroke: var(--color-line); stroke-width: 2; }
+    .tree text { fill: var(--color-ink); font-family: var(--font-mono); font-size: 22px; text-anchor: middle; dominant-baseline: central; }
+    .tree .region { fill: none; stroke: var(--color-muted); stroke-dasharray: 8 6; }
+    .tree .region-label { fill: var(--color-muted); font-size: 22px; text-anchor: start; }
+    .tree .self rect { stroke: var(--color-accent); }
+    .tree .self text { fill: var(--color-accent); }
+    .tree .direct rect { stroke: var(--color-accent); }
+    .tree .indirect rect { stroke-dasharray: 6 4; }
+    .tree .bad rect { stroke: var(--color-danger); }
+    .tree .bad text { fill: var(--color-danger); }
+    .tree line.hot { stroke: var(--color-danger); stroke-width: 3; }
+    .tree .tag { font-family: var(--font-body); font-size: 22px; text-anchor: start; }
+    .tree .tag.danger { fill: var(--color-danger); }
+    .tree .tag.accent { fill: var(--color-accent); }
+    .figure { display: flex; flex-direction: column; gap: 16px; }
+  </style>
+</head>
+<body class="slide">
+  <h1>サプライチェーン攻撃</h1>
+  <div class="figure">
+    <svg class="tree" viewBox="0 0 1120 370" role="img" aria-label="依存木">
+      <rect class="region" x="100" y="100" width="920" height="262" rx="16"/>
+      <text class="region-label" x="116" y="86">node_modules</text>
+      <line class="hot" x1="560" y1="62" x2="330" y2="114"/>
+      <line x1="560" y1="62" x2="790" y2="114"/>
+      <line class="hot" x1="330" y1="158" x2="200" y2="210"/>
+      <line x1="330" y1="158" x2="460" y2="210"/>
+      <line x1="790" y1="158" x2="790" y2="210"/>
+      <line class="hot" x1="200" y1="254" x2="200" y2="306"/>
+      <line x1="790" y1="254" x2="660" y2="306"/>
+      <line x1="790" y1="254" x2="920" y2="306"/>
+      <g class="bad"><rect x="480" y="18" width="160" height="44" rx="8"/><text x="560" y="40">my-app</text></g>
+      <g class=""><rect x="250" y="114" width="160" height="44" rx="8"/></g>
+      <g class=""><rect x="710" y="114" width="160" height="44" rx="8"/></g>
+      <g class=""><rect x="120" y="210" width="160" height="44" rx="8"/></g>
+      <g class=""><rect x="380" y="210" width="160" height="44" rx="8"/></g>
+      <g class=""><rect x="710" y="210" width="160" height="44" rx="8"/></g>
+      <g class="bad"><rect x="120" y="306" width="160" height="44" rx="8"/></g>
+      <g class=""><rect x="580" y="306" width="160" height="44" rx="8"/></g>
+      <g class=""><rect x="840" y="306" width="160" height="44" rx="8"/></g>
+      <text class="tag danger" x="296" y="328">← 乗っ取られた</text>
+      <text class="tag danger" x="656" y="40">← 悪意あるコードが動く</text>
+    </svg>
+  </div>
+  <p>末端のパッケージが1つ乗っ取られると、<strong>悪意あるコードが自分の環境に入り込む</strong></p>
+  <aside class="notes">
+    ここで、木の末端にあるパッケージが1つ乗っ取られたとします。悪意あるバージョンが公開されると、インストールしたときに、依存をたどってそのまま自分の環境に入ってきます。そして、自分のプロジェクトの中で、悪意あるコードが動いてしまいます。これがサプライチェーン攻撃です。
+  </aside>
+</body>
+</html>

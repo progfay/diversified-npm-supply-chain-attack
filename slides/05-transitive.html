@@ -29,18 +29,19 @@
     .tree { width: auto; height: 300px; display: block; margin: 0 auto; }
     .tree line { stroke: var(--color-line); stroke-width: 2; }
     .tree rect { fill: var(--color-surface); stroke: var(--color-line); stroke-width: 2; }
-    .tree text { fill: var(--color-ink); font-family: var(--font-mono); font-size: 20px; text-anchor: middle; dominant-baseline: central; }
+    .tree text { fill: var(--color-ink); font-family: var(--font-mono); font-size: 22px; text-anchor: middle; dominant-baseline: central; }
+    .tree .region { fill: none; stroke: var(--color-muted); stroke-dasharray: 8 6; }
+    .tree .region-label { fill: var(--color-muted); font-size: 22px; text-anchor: start; }
     .tree .self rect { stroke: var(--color-accent); }
     .tree .self text { fill: var(--color-accent); }
     .tree .direct rect { stroke: var(--color-accent); }
     .tree .indirect rect { stroke-dasharray: 6 4; }
-    .tree .indirect text { fill: var(--color-muted); }
-    .tree .bad rect { stroke: var(--color-danger); fill: var(--color-surface); }
+    .tree .bad rect { stroke: var(--color-danger); }
     .tree .bad text { fill: var(--color-danger); }
-    .tree .tag { font-family: var(--font-body); font-size: 18px; }
-    .tree .tag.accent { fill: var(--color-accent); }
+    .tree line.hot { stroke: var(--color-danger); stroke-width: 3; }
+    .tree .tag { font-family: var(--font-body); font-size: 22px; text-anchor: start; }
     .tree .tag.danger { fill: var(--color-danger); }
-    .tree .tag.muted { fill: var(--color-muted); }
+    .tree .tag.accent { fill: var(--color-accent); }
     .figure { display: flex; flex-direction: column; gap: 16px; }
     .legend { display: flex; justify-content: center; gap: 48px; font-size: var(--text-muted); }
     .legend .direct { color: var(--color-accent); }
@@ -50,24 +51,26 @@
 <body class="slide">
   <h1>自分で入れていないパッケージも動く</h1>
   <div class="figure">
-    <svg class="tree" viewBox="0 0 1120 350" role="img" aria-label="サンプルの依存木">
-      <line x1="560" y1="50" x2="330" y2="102"/>
-      <line x1="560" y1="50" x2="790" y2="102"/>
-      <line x1="330" y1="146" x2="200" y2="198"/>
-      <line x1="330" y1="146" x2="460" y2="198"/>
-      <line x1="790" y1="146" x2="790" y2="198"/>
-      <line x1="200" y1="242" x2="200" y2="294"/>
-      <line x1="790" y1="242" x2="660" y2="294"/>
-      <line x1="790" y1="242" x2="920" y2="294"/>
-      <g class="self"><rect x="480" y="6" width="160" height="44" rx="8"/><text x="560" y="28">my-app</text></g>
-      <g class="direct"><rect x="250" y="102" width="160" height="44" rx="8"/><text x="330" y="124">pkg-a</text></g>
-      <g class="direct"><rect x="710" y="102" width="160" height="44" rx="8"/><text x="790" y="124">pkg-b</text></g>
-      <g class="indirect"><rect x="120" y="198" width="160" height="44" rx="8"/><text x="200" y="220">pkg-c</text></g>
-      <g class="indirect"><rect x="380" y="198" width="160" height="44" rx="8"/><text x="460" y="220">pkg-d</text></g>
-      <g class="indirect"><rect x="710" y="198" width="160" height="44" rx="8"/><text x="790" y="220">pkg-e</text></g>
-      <g class="bad indirect"><rect x="120" y="294" width="160" height="44" rx="8"/><text x="200" y="316">pkg-f</text></g>
-      <g class="indirect"><rect x="580" y="294" width="160" height="44" rx="8"/><text x="660" y="316">pkg-g</text></g>
-      <g class="indirect"><rect x="840" y="294" width="160" height="44" rx="8"/><text x="920" y="316">pkg-h</text></g>
+    <svg class="tree" viewBox="0 0 1120 370" role="img" aria-label="依存木">
+      <rect class="region" x="100" y="100" width="920" height="262" rx="16"/>
+      <text class="region-label" x="116" y="86">node_modules</text>
+      <line x1="560" y1="62" x2="330" y2="114"/>
+      <line x1="560" y1="62" x2="790" y2="114"/>
+      <line x1="330" y1="158" x2="200" y2="210"/>
+      <line x1="330" y1="158" x2="460" y2="210"/>
+      <line x1="790" y1="158" x2="790" y2="210"/>
+      <line x1="200" y1="254" x2="200" y2="306"/>
+      <line x1="790" y1="254" x2="660" y2="306"/>
+      <line x1="790" y1="254" x2="920" y2="306"/>
+      <g class="self"><rect x="480" y="18" width="160" height="44" rx="8"/><text x="560" y="40">my-app</text></g>
+      <g class="direct"><rect x="250" y="114" width="160" height="44" rx="8"/></g>
+      <g class="direct"><rect x="710" y="114" width="160" height="44" rx="8"/></g>
+      <g class="indirect"><rect x="120" y="210" width="160" height="44" rx="8"/></g>
+      <g class="indirect"><rect x="380" y="210" width="160" height="44" rx="8"/></g>
+      <g class="indirect"><rect x="710" y="210" width="160" height="44" rx="8"/></g>
+      <g class="indirect"><rect x="120" y="306" width="160" height="44" rx="8"/></g>
+      <g class="indirect"><rect x="580" y="306" width="160" height="44" rx="8"/></g>
+      <g class="indirect"><rect x="840" y="306" width="160" height="44" rx="8"/></g>
     </svg>
     <div class="legend">
       <span class="direct">▭ 自分で入れた</span>

@@ -26,30 +26,30 @@
     .slide p { margin: 0; text-wrap: pretty; }
     .slide code { font-family: var(--font-mono); }
     .slide strong { color: var(--color-accent); }
-    .rows {
+    .cols {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 24px;
+    }
+    .col {
+      padding: 32px 28px;
+      border-radius: 12px;
+      background: var(--color-surface);
+      border-top: 4px solid var(--color-accent);
       display: flex;
       flex-direction: column;
       gap: 20px;
     }
-    .row {
-      display: grid;
-      grid-template-columns: 340px 1fr;
-      gap: 24px;
-      align-items: center;
-      padding: 20px 28px;
-      border-radius: 12px;
-      background: var(--color-surface);
-    }
-    .row b { color: var(--color-accent); font-size: var(--text-h2); }
-    .row span { font-size: var(--text-muted); line-height: 1.6; }
+    .col h2 { font-family: var(--font-display); font-size: var(--text-h2); color: var(--color-accent); margin: 0; text-wrap: balance; }
+    .col p { font-size: var(--text-muted); line-height: 1.7; }
   </style>
 </head>
 <body class="slide">
   <h1>新しい手口を勉強し続ける</h1>
-  <div class="rows">
-    <div class="row"><b>手口は増え続ける</b><span>インストール時だけでなく、import 時(node-ipc)やフォルダを開いた時(keyv)にも動く</span></div>
-    <div class="row"><b>対策の不備も見つかる</b><span>pnpm の Minimum Release Age は、lockfile を約4か月検査していなかった</span></div>
-    <div class="row"><b>既定値も変わる</b><span>npm v12 で install スクリプトが既定でオフに</span></div>
+  <div class="cols">
+    <section class="col"><h2>手口は増え続ける</h2><p>インストール時だけでなく、import 時(node-ipc)やフォルダを開いた時(keyv)にも動く</p></section>
+    <section class="col"><h2>対策の不備も見つかる</h2><p>pnpm の Minimum Release Age は、lockfile を約4か月検査していなかった</p></section>
+    <section class="col"><h2>既定値も変わる</h2><p>npm v12 で install スクリプトが既定でオフに</p></section>
   </div>
   <aside class="notes">
     攻撃の手口は増え続けています。インストールのときだけでなく、import したときや、keyv のようにフォルダを開いただけで動くものも出てきました。対策側の不備も見つかります。pnpm の Minimum Release Age は、lockfile にすでにあるバージョンを検査していませんでした。最初は仕様だと説明されて、約4か月後に修正されています。既定値も変わります。npm は 2026年7月の v12 で、install スクリプトを既定でオフにしました。一度設定したら終わり、ではありません。攻撃の流行も、対策の不備や変化も、キャッチアップし続けて、自分の設定に反映していく必要があります。私は、セキュリティベンダーのブログやインシデントのレポートを追うようにしています。今日話した事例も、ほとんどがそういうレポートで知ったものです。レポートには、何が起きたかだけでなく、どんな経路で動いたのか、どの対策なら止まったのかまで書かれていることが多いので、自分の設定と見比べるのに役立ちます。それから、今日このあと、夜7時20分からの基調講演では、chalk や debug のメンテナの Josh Junon さんが、実際にアカウントを乗っ取られた経験を話してくれます。当事者の話を直接聞ける機会はなかなかないので、ぜひ聞きに行ってみてください。
