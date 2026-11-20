@@ -42,14 +42,17 @@
     }
     .row b { color: var(--color-accent); font-size: var(--text-h2); }
     .row span { color: var(--color-muted); font-size: var(--text-muted); }
+    .row .txt { display: flex; flex-direction: column; gap: 6px; }
+    .row .txt .ex { color: var(--color-ink); font-size: var(--text-body); display: flex; align-items: center; gap: 10px; }
+    .row .txt .ex i { font-style: normal; font-size: var(--text-code); color: var(--color-accent); border: 1px solid var(--color-accent); border-radius: 6px; padding: 0 8px; line-height: 1.6; }
   </style>
 </head>
 <body class="slide">
   <h1>被害が小さくなるようにする</h1>
   <div class="rows">
-    <div class="row"><b>渡す権限を絞る</b><span>必要以上の権限やクレデンシャルを、実行環境に渡さない</span></div>
-    <div class="row"><b>触れる範囲を狭める</b><span>悪意あるコードが読めるものを減らす</span></div>
-    <div class="row"><b>無効化の準備をする</b><span>鍵をローテートできるようにしておく</span></div>
+    <div class="row"><b>渡す権限を絞る</b><div class="txt"><span>必要以上の権限やクレデンシャルを、実行環境に渡さない</span><span class="ex"><i>例</i>OIDC で短命な Token を発行し使う</span></div></div>
+    <div class="row"><b>触れる範囲を狭める</b><div class="txt"><span>悪意あるコードが読めるものを減らす</span><span class="ex"><i>例</i>開発環境を Sandbox 化する</span></div></div>
+    <div class="row"><b>無効化の準備をする</b><div class="txt"><span>鍵をローテートできるようにしておく</span><span class="ex"><i>例</i>防災訓練をする</span></div></div>
   </div>
   <aside class="notes">被害を受けにくくしても、ゼロにはなりません。なので受けた際の影響を小さくしましょう。
 例えば渡す権限を絞ったり、コードから触れるファイルやデータを制限したり、すぐに key rotate できるように準備したりしておきましょう。</aside>
