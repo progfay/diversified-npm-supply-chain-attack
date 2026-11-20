@@ -32,7 +32,7 @@
       gap: 24px;
     }
     .col {
-      padding: 32px 28px;
+      padding: 32px 18px;
       border-radius: 12px;
       background: var(--color-surface);
       position: relative;
@@ -41,7 +41,7 @@
       flex-direction: column;
       gap: 20px;
     }
-    .col h2 { font-family: var(--font-display); font-size: var(--text-h2); color: var(--color-accent); margin: 0; text-wrap: balance; }
+    .col h2 { font-family: var(--font-display); font-size: var(--text-h2); color: var(--color-accent); margin: 0; white-space: nowrap; letter-spacing: -0.02em; }
     .col p { font-size: var(--text-muted); line-height: 1.7; }
     .col::before {
       content: '';
@@ -59,10 +59,12 @@
 <body class="slide">
   <h1>最新動向を追い続ける</h1>
   <div class="cols">
-    <section class="col"><h2>手口は増え続ける</h2><p>今までも攻撃の手口は進化・多様化してきた。未知の攻撃手法の出現に向けて、定常的に備えておく必要がある。</p></section>
+    <section class="col"><h2>手口は増え続ける</h2><p>攻撃の手口は進化・多様化する。<br>未知の手口に備える必要がある。</p></section>
     <section class="col"><h2>新しい対策も増える</h2><p class="opts"><code>trustPolicy</code><br><span class="d">公開経路の信頼度が下がったバージョンを弾く</span><br><code class="next">blockExoticSubdeps</code><br><span class="d">推移的依存の URL・Git 指定を弾く</span></p></section>
     <section class="col"><h2>対策の不備も見つかる</h2><p>pnpm の Minimum Release Age は、lockfile を約4か月検査していなかった</p></section>
   </div>
-  <aside class="notes">攻撃の手口は増え続けています。インストールのときだけでなく、import したときや、keyv のようにフォルダを開いただけで動くものも出てきました。一方で、新しい対策も増えています。npm には、公開から一定期間待つ min-release-age や、スクリプトを許可制にする allowScripts、Git の依存を制限する allow-git が入りました。pnpm にも、minimumReleaseAge のほか、公開経路の信頼度が下がったバージョンを弾く trustPolicy や、怪しい取得元の推移的依存を弾く blockExoticSubdeps などがあります。そして、対策側の不備も見つかります。pnpm の Minimum Release Age は、lockfile にすでにあるバージョンを検査していませんでした。最初は仕様だと説明されて、約4か月後に修正されています。一度設定したら終わり、ではありません。攻撃の流行も、新しい対策も、対策の不備も、キャッチアップし続けて、自分の設定に反映していく必要があります。私は、セキュリティベンダーのブログやインシデントのレポートを追うようにしています。今日話した事例も、ほとんどがそういうレポートで知ったものです。</aside>
+  <aside class="notes">攻撃の手口は時間と共に進化・多様化していきます。未知の手法に備えるためには継続的な勉強が必要です。
+攻撃の手口に対抗するために対策も増えていきます。新しく登場した対策を必要に応じて取り込んでいくことも大切です。
+また、過去の対策に不備が見つかることもあります。このような情報にアンテナを立てて収集し勉強していく姿勢が大切だと私は考えています。</aside>
 </body>
 </html>
