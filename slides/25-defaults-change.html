@@ -54,13 +54,14 @@
     .opts code { color: var(--color-ink); }
     .opts .d { color: var(--color-muted); }
     .opts .next { display: inline-block; margin-top: 20px; }
+    .opts .ref { color: var(--color-danger); font-size: var(--text-code); }
   </style>
 </head>
 <body class="slide">
   <h1>最新動向を追い続ける</h1>
   <div class="cols">
     <section class="col"><h2>手口は増え続ける</h2><p>攻撃の手口は進化・多様化する。<br>未知の手口に備える必要がある。</p></section>
-    <section class="col"><h2>新しい対策も増える</h2><p class="opts"><code>trustPolicy</code><br><span class="d">公開経路の信頼度が下がったバージョンを弾く</span><br><code class="next">blockExoticSubdeps</code><br><span class="d">推移的依存の URL・Git 指定を弾く</span></p></section>
+    <section class="col"><h2>新しい対策も増える</h2><p class="opts"><code>trustPolicy</code><br><span class="d">公開経路の信頼度が下がったバージョンを弾く</span><br><code class="next">blockExoticSubdeps</code><br><span class="d">推移的依存の URL・Git 指定を弾く</span><br><span class="ref">← PhantomRaven の手口</span></p></section>
     <section class="col"><h2>対策の不備も見つかる</h2><p>pnpm の Minimum Release Age は、lockfile を約4か月検査していなかった</p></section>
   </div>
   <aside class="notes">攻撃の手口は時間と共に進化・多様化していきます。未知の手法に備えるためには継続的な勉強が必要です。
