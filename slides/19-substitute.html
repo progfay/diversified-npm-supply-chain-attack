@@ -2,7 +2,7 @@
 <html lang="ja">
 <head>
   <meta charset="utf-8">
-  <title>無理のない依存の減らし方</title>
+  <title>依存の減らし方</title>
   <link rel="stylesheet" href="../design-system/system.css">
   <style>
     .slide {
@@ -40,10 +40,13 @@
     .card::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 4px; background: var(--color-accent); }
     .card h2 { font-family: var(--font-display); font-size: var(--text-h2); margin: 0; }
     .card .ex { font-size: var(--text-muted); color: var(--color-muted); line-height: 1.6; }
+    .card.teaser { justify-content: center; align-items: center; background: transparent; border: 2px dashed var(--color-line); }
+    .card.teaser::before { content: none; }
+    .card.teaser h2 { color: var(--color-muted); }
   </style>
 </head>
 <body class="slide">
-  <h1>無理のない依存の減らし方</h1>
+  <h1>依存の減らし方</h1>
   <div class="grid">
     <section class="card">
       <h2>使われていない依存を消す</h2>
@@ -51,19 +54,18 @@
     </section>
     <section class="card">
       <h2>重複した依存を消す</h2>
-      <p class="ex">date-fns と dayjs<br>concurrently と npm-run-all2<br>chalk と picocolors</p>
-    </section>
-    <section class="card">
-      <h2>既存の依存が基本</h2>
-      <p class="ex">新しく足す前に、いまある依存で同じことができないか確かめる</p>
+      <p class="ex">date-fns / dayjs<br>chalk / picocolors<br>concurrently / npm-run-all2</p>
     </section>
     <section class="card">
       <h2>Runtime の機能を使う</h2>
-      <p class="ex">chalk → <code>util.styleText</code><br>uuid → <code>crypto.randomUUID</code><br>throttle → <code>util.throttle</code><br>rimraf → <code>fs.rmSync</code></p>
+      <p class="ex">uuid → <code>crypto.randomUUID</code><br>throttle → <code>util.throttle</code><br>rimraf → <code>fs.rmSync</code></p>
+    </section>
+    <section class="card teaser">
+      <h2>もしくは自作…？</h2>
     </section>
   </div>
   <aside class="notes">
-    無理のない減らし方をいくつか挙げます。1つは、Runtime の機能を使うこと。chalk の代わりに util.styleText、uuid の代わりに crypto.randomUUID が使えますし、throttle も最近 util に入りましたし、rimraf の代わりに fs.rmSync も使えます。次に、新しく足す前に、既存の依存で同じことができないかを確かめること。それから、同じ役割の依存が重複していないか。date-fns と dayjs、concurrently と npm-run-all2、chalk と picocolors のように、気付くと両方入っていることがあります。最後に、package.json に残っているだけで使われていない依存を、knip などで見つけて消すことです。どれも、信頼する相手を増やさずに、減らす方向に働きます。
+    依存の減らし方をいくつか挙げます。まず、package.json に残っているだけで使われていない依存を、knip などで見つけて消すこと。次に、同じ役割の依存が重複していないか。date-fns と dayjs、chalk と picocolors、concurrently と npm-run-all2 のように、気付くと両方入っていることがあります。それから、Runtime の機能を使うこと。uuid の代わりに crypto.randomUUID、rimraf の代わりに fs.rmSync が使えますし、throttle も最近 util に入りました。どれも、信頼する相手を増やさずに、減らす方向に働きます。では、いっそ自作するのはどうでしょう。
   </aside>
 </body>
 </html>
