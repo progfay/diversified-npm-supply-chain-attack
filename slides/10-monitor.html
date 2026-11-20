@@ -26,7 +26,7 @@
     .slide p { margin: 0; text-wrap: pretty; }
     .slide code { font-family: var(--font-mono); }
     .slide strong { color: var(--color-accent); }
-    .fig { width: 100%; height: auto; display: block; margin: auto 0; }
+    .fig { width: 100%; height: auto; display: block; margin: auto 0; max-height: 330px; }
     .fig rect { fill: var(--color-surface); stroke: var(--color-line); stroke-width: 2; }
     .fig .group { fill: none; stroke: var(--color-muted); stroke-dasharray: 8 6; }
     .fig .glabel { fill: var(--color-muted); font-size: 20px; text-anchor: start; }
@@ -35,11 +35,14 @@
     .fig polygon { fill: var(--color-muted); }
     .fig text { fill: var(--color-ink); font-family: var(--font-body); font-size: 26px; text-anchor: middle; dominant-baseline: central; }
     .fig .sub { fill: var(--color-muted); font-size: 18px; }
+    .slide .lead { text-align: center; font-size: var(--text-h2); font-weight: 700; }
+    .slide .lead small { display: block; font-size: var(--text-muted); font-weight: 400; color: var(--color-muted); }
   </style>
 </head>
 <body class="slide">
   <h1>Minimum Release Age は誰かが気付く前提</h1>
-  <svg class="fig" viewBox="0 0 1050 320" role="img" aria-label="公開されたパッケージを企業・メンテナ・利用者が監視し、検知されると取り下げられる図"><g><rect x="10" y="125" width="150" height="70" rx="10"/><text x="85" y="160">公開</text></g><rect class="group" x="230" y="10" width="330" height="300" rx="16"/><text class="glabel" x="246" y="34">監視</text><g><rect x="260" y="52" width="270" height="70" rx="10"/><text x="395" y="76">企業</text><text class="sub" x="395" y="104">Socket・Aikido など</text></g><g><rect x="260" y="138" width="270" height="70" rx="10"/><text x="395" y="173">メンテナ</text></g><g><rect x="260" y="224" width="270" height="70" rx="10"/><text x="395" y="259">利用者</text></g><line x1="160" y1="160" x2="218.4" y2="160.0"/><polygon points="228,160 212.0,168.0 212.0,152.0"/><line x1="560" y1="160" x2="618.4" y2="160.0"/><polygon points="628,160 612.0,168.0 612.0,152.0"/><g class="key"><rect x="630" y="125" width="170" height="70" rx="10"/><text x="715" y="160">検知</text></g><line x1="800" y1="160" x2="858.4" y2="160.0"/><polygon points="868,160 852.0,168.0 852.0,152.0"/><g class="key"><rect x="870" y="125" width="170" height="70" rx="10"/><text x="955" y="160">取り下げ</text></g></svg>
+  <svg class="fig" viewBox="0 0 1050 320" role="img" aria-label="公開されたパッケージを企業・メンテナ・利用者が監視し、検知されると取り下げられる図"><g><rect x="10" y="125" width="150" height="70" rx="10"/><text x="85" y="160">公開</text></g><rect class="group" x="230" y="10" width="330" height="300" rx="16"/><text class="glabel" x="246" y="34">監視</text><g><rect x="260" y="52" width="270" height="70" rx="10"/><text x="395" y="76">セキュリティ</text><text class="sub" x="395" y="104">Socket・Aikido など</text></g><g><rect x="260" y="138" width="270" height="70" rx="10"/><text x="395" y="173">メンテナ</text></g><g><rect x="260" y="224" width="270" height="70" rx="10"/><text x="395" y="259">利用者</text></g><line x1="160" y1="160" x2="218.4" y2="160.0"/><polygon points="228,160 212.0,168.0 212.0,152.0"/><line x1="560" y1="160" x2="618.4" y2="160.0"/><polygon points="628,160 612.0,168.0 612.0,152.0"/><g class="key"><rect x="630" y="125" width="170" height="70" rx="10"/><text x="715" y="160">検知</text></g><line x1="800" y1="160" x2="858.4" y2="160.0"/><polygon points="868,160 852.0,168.0 852.0,152.0"/><g class="key"><rect x="870" y="125" width="170" height="70" rx="10"/><text x="955" y="160">取り下げ</text></g></svg>
+  <p class="lead">公開から取り下げまで、<strong>だいたい数時間</strong><small>AsyncAPI は約4時間 / pnpm のドキュメントでは「多くは1時間以内に見つかって消される」</small></p>
   <aside class="notes">
     次に Minimum Release Age です。これは、誰かが気付いて消してくれる、という前提の上に成り立っています。では、その誰かとは誰でしょう。今は、セキュリティ企業が、新しく公開されたバージョンを自動で検査しています。chalk や debug のときは、Aikido の監視が見つけました。メンテナ本人や利用者が気付いて報告することもあります。報告されると、悪意あるバージョンは取り下げられます。AsyncAPI は、公開から約4時間で取り下げられました。pnpm のドキュメントにも、悪意あるリリースの多くは1時間以内に見つかって消される、と書かれています。その間だけ待つのが、Minimum Release Age です。
   </aside>
