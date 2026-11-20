@@ -48,7 +48,7 @@
   <div class="rows">
     <div class="row"><b><a href="https://snyk.io/blog/malicious-node-ipc-versions-published-npm"><code>require('node-ipc')</code></a></b><p><code>~/.aws/credentials</code>, <code>~/.ssh</code>, GitHub Token などを盗む</p></div>
     <div class="row"><b><a href="https://www.microsoft.com/en-us/security/blog/2026/07/15/unpacking-asyncapi-npm-supply-chain-compromise-import-time-payload-delivery/"><code>import '@asyncapi/specs'</code></a></b><p>PC を外から遠隔操作できるマルウェアを仕込む</p></div>
-    <div class="row"><b><a href="https://www.aikido.dev/blog/npm-debug-and-chalk-packages-compromised"><code>import 'chalk'</code></a></b><p>ブラウザで fetch などをフックし、送金先を書き換える</p></div>
+    <div class="row"><b><a href="https://www.aikido.dev/blog/npm-debug-and-chalk-packages-compromised"><code>import 'chalk'</code></a></b><p>Browser にて仮想通貨の送金先を書き換える</p></div>
   </div>
   <aside class="notes">
     実際に、そういう攻撃がありました。2026年5月の node-ipc は、週に約85万回ダウンロードされているパッケージですが、悪意あるバージョンは require しただけで、クラウドの鍵や SSH 鍵、GitHub のトークンなどを集めて送っていました。7月の AsyncAPI では、読み込むと PC を外から遠隔操作できるマルウェアが仕込まれました。ブラウザに保存したパスワードや Cookie まで狙うものです。2025年9月の chalk や debug では、改ざんされたコードがブラウザで読み込まれた時点で、fetch やウォレットの API をフックして、送金先を攻撃者のアドレスに書き換えていました。どれも postinstall は使っていないので、ブロックしていても止まりません。
