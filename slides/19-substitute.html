@@ -46,20 +46,20 @@
   <h1>無理のない依存の減らし方</h1>
   <div class="grid">
     <section class="card">
-      <h2>Runtime の機能を使う</h2>
-      <p class="ex">chalk → <code>util.styleText</code><br>uuid → <code>crypto.randomUUID</code><br>throttle → <code>util.throttle</code><br>debounce → <code>util.debounce</code></p>
-    </section>
-    <section class="card">
-      <h2>既存の依存が基本</h2>
-      <p class="ex">新しく足す前に、いまある依存で同じことができないか確かめる</p>
+      <h2>使われていない依存を消す</h2>
+      <p class="ex">package.json に残っているだけの依存を、knip などで見つけて消す</p>
     </section>
     <section class="card">
       <h2>重複した依存を消す</h2>
       <p class="ex">date-fns と dayjs<br>concurrently と npm-run-all2<br>chalk と picocolors</p>
     </section>
     <section class="card">
-      <h2>使われていない依存を消す</h2>
-      <p class="ex">package.json に残っているだけの依存を、knip などで見つけて消す</p>
+      <h2>既存の依存が基本</h2>
+      <p class="ex">新しく足す前に、いまある依存で同じことができないか確かめる</p>
+    </section>
+    <section class="card">
+      <h2>Runtime の機能を使う</h2>
+      <p class="ex">chalk → <code>util.styleText</code><br>uuid → <code>crypto.randomUUID</code><br>throttle → <code>util.throttle</code><br>debounce → <code>util.debounce</code></p>
     </section>
   </div>
   <aside class="notes">
