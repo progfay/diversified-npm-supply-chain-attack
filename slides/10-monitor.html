@@ -26,28 +26,29 @@
     .slide p { margin: 0; text-wrap: pretty; }
     .slide code { font-family: var(--font-mono); }
     .slide strong { color: var(--color-accent); }
-    .rows { display: flex; flex-direction: column; gap: 16px; }
-    .row {
-      display: grid;
-      grid-template-columns: 380px 1fr;
-      gap: 24px;
-      align-items: center;
-      padding: 18px 28px;
-      border-radius: 12px;
-      background: var(--color-surface);
-    }
-    .row b { color: var(--color-accent); font-size: var(--text-body); }
-    .row span { font-size: var(--text-muted); color: var(--color-muted); }
+    .fig { width: auto; height: 330px; display: block; margin: 0 auto; flex-shrink: 0; }
+    .fig rect { fill: var(--color-surface); stroke: var(--color-line); stroke-width: 2; }
+    .fig .key rect { stroke: var(--color-accent); }
+    .fig line { stroke: var(--color-muted); stroke-width: 3; }
+    .fig polygon { fill: var(--color-muted); }
+    .fig text { fill: var(--color-ink); font-family: var(--font-body); font-size: 26px; text-anchor: middle; dominant-baseline: central; }
+    .fig .sub { fill: var(--color-muted); font-size: 18px; }
     .slide .lead { margin-top: auto; text-align: center; font-size: var(--text-h2); font-weight: 700; }
   </style>
 </head>
 <body class="slide">
   <h1>Minimum Release Age は誰かが気付く前提</h1>
-  <div class="rows">
-    <div class="row"><b>セキュリティ企業の自動監視</b><span>新しく公開されたバージョンを自動で検査する(Socket、Aikido、StepSecurity など)</span></div>
-    <div class="row"><b>メンテナや利用者の報告</b><span>異変に気付いた人が報告する</span></div>
-    <div class="row"><b>悪意あるバージョンの取り下げ</b><span>報告を受けて取り下げられる(AsyncAPI は約4時間)</span></div>
-  </div>
+  <svg class="fig" viewBox="0 0 1000 330" role="img" aria-label="企業・メンテナ・利用者の監視が検知につながり、修正される図">
+    <g><rect x="40" y="10" width="260" height="76" rx="10"/><text x="170" y="38">企業</text><text class="sub" x="170" y="66">Socket・Aikido など</text></g>
+    <g><rect x="370" y="10" width="260" height="76" rx="10"/><text x="500" y="48">メンテナ</text></g>
+    <g><rect x="700" y="10" width="260" height="76" rx="10"/><text x="830" y="48">利用者</text></g>
+    <line x1="170" y1="86" x2="476" y2="150"/><polygon points="486,152 466,155 470,141"/>
+    <line x1="500" y1="86" x2="500" y2="140"/><polygon points="500,154 492,138 508,138"/>
+    <line x1="830" y1="86" x2="524" y2="150"/><polygon points="514,152 530,141 534,155"/>
+    <g class="key"><rect x="370" y="156" width="260" height="60" rx="10"/><text x="500" y="186">検知</text></g>
+    <line x1="500" y1="216" x2="500" y2="250"/><polygon points="500,264 492,248 508,248"/>
+    <g class="key"><rect x="370" y="266" width="260" height="60" rx="10"/><text x="500" y="296">修正(取り下げ)</text></g>
+  </svg>
   <p class="lead">その間だけ<strong>待つ</strong>のが Minimum Release Age</p>
   <aside class="notes">
     次に Minimum Release Age です。これは、誰かが気付いて消してくれる、という前提の上に成り立っています。では、その誰かとは誰でしょう。今は、セキュリティ企業が、新しく公開されたバージョンを自動で検査しています。chalk や debug のときは、Aikido の監視が見つけました。メンテナ本人や利用者が気付いて報告することもあります。報告されると、悪意あるバージョンは取り下げられます。AsyncAPI は、公開から約4時間で取り下げられました。pnpm のドキュメントにも、悪意あるリリースの多くは1時間以内に見つかって消される、と書かれています。その間だけ待つのが、Minimum Release Age です。

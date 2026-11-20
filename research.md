@@ -308,3 +308,10 @@ scripts なし + `binding.gyp` のみのパッケージ(gyp の `<!(...)` でマ
   - cacheable 2.5.0 → keyv(`^5.6.0`)
 - → **eslint を入れただけで、2026年8月に侵害された keyv / cacheable の名前空間のパッケージが入る**
 - 注意: これは「今の最新版」の依存関係。事件当時のバージョンでの経路は確認していない(当時は `eslint → file-entry-cache → flat-cache → keyv` だったとする資料もある)。スライドでは「今の依存関係だと」と言う
+
+## pnpm の trustPolicy / blockExoticSubdeps(2026-11-20、pnpm docs 原文)
+
+- 🟢 `trustPolicy`(既定 off / `no-downgrade`): 以前のリリースより信頼の証拠が弱くなった(例: trusted publisher → provenance のみ / なし)バージョンのインストールを失敗させる
+- 🟢 `blockExoticSubdeps`(既定 true): Git リポジトリや tarball の URL といった「exotic」な取得元を使えるのは直接依存だけ。推移的依存はレジストリなど信頼できる取得元から解決させる
+
+出典: https://github.com/pnpm/pnpm.io/blob/main/docs/settings/dependency-resolution.md

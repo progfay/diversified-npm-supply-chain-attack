@@ -78,12 +78,8 @@
       </div>
     </div>
   </div>
-  <div class="ex">
-    <p><b>node-ipc</b>: <code>require</code> しただけで、クラウドの鍵・SSH 鍵・GitHub のトークンなどを盗む</p>
-    <p><b>AsyncAPI</b>: 読み込むと、PC を外から遠隔操作できるマルウェアを仕込む</p>
-  </div>
   <aside class="notes">
-    まず postinstall のブロックです。止められるのは、インストールのときに動くスクリプトだけです。でも、悪意あるコードは、パッケージを require や import した時点でも動かせます。1つめの例では、悪意あるバージョンを require しただけで、クラウドの鍵や SSH 鍵、GitHub のトークンなどが集められて、外に送られていました。2つめの例では、読み込むと、PC を外から遠隔操作できるマルウェアが仕込まれました。ブラウザに保存したパスワードや Cookie まで狙うものです。どちらも postinstall を使っていないので、ブロックしていても止まりません。
+    まず postinstall のブロックです。止められるのは、npm install のときに動く preinstall や postinstall のスクリプトだけです。でも、そのあと npm start や npm test、npm run lint を実行すると、パッケージが import されます。悪意あるコードは、この import の時点でも動かせます。ここは、postinstall をブロックしていても止められません。
   </aside>
 </body>
 </html>

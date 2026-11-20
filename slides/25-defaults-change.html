@@ -50,17 +50,19 @@
       height: 4px;
       background: var(--color-accent);
     }
+    .opts b { color: var(--color-muted); font-weight: 700; }
+    .opts code { color: var(--color-ink); }
   </style>
 </head>
 <body class="slide">
   <h1>新しい手口を勉強し続ける</h1>
   <div class="cols">
     <section class="col"><h2>手口は増え続ける</h2><p>インストール時だけでなく、import 時(node-ipc)やフォルダを開いた時(keyv)にも動く</p></section>
+    <section class="col"><h2>新しい対策も増える</h2><p class="opts"><b>npm</b><br><code>min-release-age</code><br><code>allowScripts</code><br><code>--allow-git</code><br><b>pnpm</b><br><code>minimumReleaseAge</code><br><code>trustPolicy</code><br><code>blockExoticSubdeps</code></p></section>
     <section class="col"><h2>対策の不備も見つかる</h2><p>pnpm の Minimum Release Age は、lockfile を約4か月検査していなかった</p></section>
-    <section class="col"><h2>既定値も変わる</h2><p>npm v12 で install スクリプトが既定でオフに</p></section>
   </div>
   <aside class="notes">
-    攻撃の手口は増え続けています。インストールのときだけでなく、import したときや、keyv のようにフォルダを開いただけで動くものも出てきました。対策側の不備も見つかります。pnpm の Minimum Release Age は、lockfile にすでにあるバージョンを検査していませんでした。最初は仕様だと説明されて、約4か月後に修正されています。既定値も変わります。npm は 2026年7月の v12 で、install スクリプトを既定でオフにしました。一度設定したら終わり、ではありません。攻撃の流行も、対策の不備や変化も、キャッチアップし続けて、自分の設定に反映していく必要があります。私は、セキュリティベンダーのブログやインシデントのレポートを追うようにしています。今日話した事例も、ほとんどがそういうレポートで知ったものです。レポートには、何が起きたかだけでなく、どんな経路で動いたのか、どの対策なら止まったのかまで書かれていることが多いので、自分の設定と見比べるのに役立ちます。
+    攻撃の手口は増え続けています。インストールのときだけでなく、import したときや、keyv のようにフォルダを開いただけで動くものも出てきました。一方で、新しい対策も増えています。npm には、公開から一定期間待つ min-release-age や、スクリプトを許可制にする allowScripts、Git の依存を制限する allow-git が入りました。pnpm にも、minimumReleaseAge のほか、公開経路の信頼度が下がったバージョンを弾く trustPolicy や、怪しい取得元の推移的依存を弾く blockExoticSubdeps などがあります。そして、対策側の不備も見つかります。pnpm の Minimum Release Age は、lockfile にすでにあるバージョンを検査していませんでした。最初は仕様だと説明されて、約4か月後に修正されています。一度設定したら終わり、ではありません。攻撃の流行も、新しい対策も、対策の不備も、キャッチアップし続けて、自分の設定に反映していく必要があります。私は、セキュリティベンダーのブログやインシデントのレポートを追うようにしています。今日話した事例も、ほとんどがそういうレポートで知ったものです。
   </aside>
 </body>
 </html>
