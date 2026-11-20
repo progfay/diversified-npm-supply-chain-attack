@@ -46,7 +46,7 @@
     <div class="left">
       <p class="name"><a href="https://www.sonatype.com/blog/phantomraven-npm-malware">PhantomRaven</a></p>
       <ol class="steps"><li>install 時に URL から package を取得する</li><li>preinstall で InfoStealer 起動</li></ol>
-      <p class="result">→ 2か月以上気付かれなかった</p>
+      <p class="result">→ 2か月以上気付かれず、8.6万回インストールされた</p>
     </div>
     <div class="file">
       <div class="fname">package.json</div>
@@ -60,7 +60,9 @@
   </div>
   <p class="punch">誰も気付かなければ<strong>何日待っても防げない</strong></p>
   <aside class="notes">
-    では、誰も気付かなかったらどうなるか。2025年の PhantomRaven では、2か月以上気付かれず、8.6万回インストールされました。パッケージ本体は空っぽで、悪意あるコードはインストールのときに npm の外のサーバーから取ってくる作りでした。監視する側から見ると依存は0で、検査をすり抜けたんです。誰も気付かなければ、何日待っても防げません。
+    では、誰も気付かなかったらどうなるでしょうか。
+    2025年の PhantomRaven では、パッケージ本体が空っぽだったため、セキュリティ企業の検査をすり抜けて2か月以上気付かれず、8.6万回インストールされました。
+    誰も気付かなければ、何日待っても防げません。
   </aside>
 </body>
 </html>

@@ -2,7 +2,7 @@
 <html lang="ja">
 <head>
   <meta charset="utf-8">
-  <title>Supply Chain Attack</title>
+  <title>サプライチェーン攻撃</title>
   <link rel="stylesheet" href="../design-system/system.css">
   <style>
     .slide {
@@ -47,7 +47,7 @@
   </style>
 </head>
 <body class="slide">
-  <h1>Supply Chain Attack</h1>
+  <h1>サプライチェーン攻撃</h1>
     <svg class="tree" viewBox="0 0 1120 370" role="img" aria-label="依存木">
       <rect class="region" x="100" y="100" width="920" height="262" rx="16"/>
       <text class="region-label" x="116" y="86">node_modules</text>
@@ -71,7 +71,8 @@
     </svg>
   <p class="lead">攻撃者は<strong>どれか<span class="num">1</span>つを乗っ取るだけでいい</strong></p>
   <aside class="notes">
-    ここで、この木のどこか、たとえば末端のパッケージが1つ乗っ取られたとします。悪意あるバージョンが公開されると、依存をたどって、そのまま自分の環境に入ってきて、自分のプロジェクトの中で動いてしまいます。攻撃者は、この木のどれか1つを乗っ取るだけでいいんです。これがサプライチェーン攻撃です。
+    ここで、この木のどこか、たとえば末端のパッケージが1つ乗っ取られたとします。悪意あるバージョンが公開されると、依存をたどって、そのまま自分の環境に入ってきて、自分のプロジェクトの中で動いてしまいます。これがサプライチェーン攻撃です。
+    攻撃者は、この木のどれか1つを乗っ取るだけでいいんです。
   </aside>
 </body>
 </html>
