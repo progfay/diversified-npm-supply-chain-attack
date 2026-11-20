@@ -63,8 +63,6 @@
     <section class="col"><h2>新しい対策も増える</h2><p class="opts"><code>trustPolicy</code><br><span class="d">公開経路の信頼度が下がったバージョンを弾く</span><br><code class="next">blockExoticSubdeps</code><br><span class="d">推移的依存の URL・Git 指定を弾く</span></p></section>
     <section class="col"><h2>対策の不備も見つかる</h2><p>pnpm の Minimum Release Age は、lockfile を約4か月検査していなかった</p></section>
   </div>
-  <aside class="notes">
-    攻撃の手口は増え続けています。インストールのときだけでなく、import したときや、keyv のようにフォルダを開いただけで動くものも出てきました。一方で、新しい対策も増えています。npm には、公開から一定期間待つ min-release-age や、スクリプトを許可制にする allowScripts、Git の依存を制限する allow-git が入りました。pnpm にも、minimumReleaseAge のほか、公開経路の信頼度が下がったバージョンを弾く trustPolicy や、怪しい取得元の推移的依存を弾く blockExoticSubdeps などがあります。そして、対策側の不備も見つかります。pnpm の Minimum Release Age は、lockfile にすでにあるバージョンを検査していませんでした。最初は仕様だと説明されて、約4か月後に修正されています。一度設定したら終わり、ではありません。攻撃の流行も、新しい対策も、対策の不備も、キャッチアップし続けて、自分の設定に反映していく必要があります。私は、セキュリティベンダーのブログやインシデントのレポートを追うようにしています。今日話した事例も、ほとんどがそういうレポートで知ったものです。
-  </aside>
+  <aside class="notes">攻撃の手口は増え続けています。インストールのときだけでなく、import したときや、keyv のようにフォルダを開いただけで動くものも出てきました。一方で、新しい対策も増えています。npm には、公開から一定期間待つ min-release-age や、スクリプトを許可制にする allowScripts、Git の依存を制限する allow-git が入りました。pnpm にも、minimumReleaseAge のほか、公開経路の信頼度が下がったバージョンを弾く trustPolicy や、怪しい取得元の推移的依存を弾く blockExoticSubdeps などがあります。そして、対策側の不備も見つかります。pnpm の Minimum Release Age は、lockfile にすでにあるバージョンを検査していませんでした。最初は仕様だと説明されて、約4か月後に修正されています。一度設定したら終わり、ではありません。攻撃の流行も、新しい対策も、対策の不備も、キャッチアップし続けて、自分の設定に反映していく必要があります。私は、セキュリティベンダーのブログやインシデントのレポートを追うようにしています。今日話した事例も、ほとんどがそういうレポートで知ったものです。</aside>
 </body>
 </html>
