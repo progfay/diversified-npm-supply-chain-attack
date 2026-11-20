@@ -58,14 +58,21 @@
     </section>
     <section class="card">
       <h2>Runtime の機能を使う</h2>
-      <p class="ex">uuid → <code>crypto.randomUUID</code><br>throttle → <code>util.throttle</code><br>rimraf → <code>fs.rmSync</code></p>
+      <p class="ex">rimraf → <code>fs.rmSync</code><br>uuid → <code>crypto.randomUUID</code><br><code>util.throttle</code> / <code>util.debounce</code></p>
     </section>
     <section class="card teaser">
       <h2>もしくは自作...？</h2>
     </section>
   </div>
   <aside class="notes">
-    依存の減らし方をいくつか挙げます。まず、package.json に残っているだけで使われていない依存を、knip などで見つけて消すこと。次に、同じ役割の依存が重複していないか。date-fns と dayjs、chalk と picocolors、concurrently と npm-run-all2 のように、気付くと両方入っていることがあります。それから、Runtime の機能を使うこと。uuid の代わりに crypto.randomUUID、rimraf の代わりに fs.rmSync が使えますし、throttle も最近 util に入りました。どれも、信頼する相手を増やさずに、減らす方向に働きます。では、いっそ自作するのはどうでしょう。
+    依存の減らし方として、おすすめの方法をいくつか挙げます。
+    1 つ目は使われていない依存を減らすことです。使わなくなったけど package.json にはうっかり残っているものなどがあったりします。
+    二つ目は同じような package が入っている場合、一つで賄えないか考えてみることです。
+    例えば日付操作ライブラリが複数入っていたり、 npm script の並列実行のための package が複数入っていたり。
+    ちなみに並列実行は pnpm でもできるので、どっちも消せる可能性があります。
+    三つ目は Runtime の機能を使うことです。
+    Node.js に標準で組み込まれている関数を使うことで rimraf や uuid などを削除できます。最近だと util.throttle や debounce が追加されたりとどんどん runtime の built-in 機能が拡充されてきています。
+    他にも package に頼らずに処理を自分で書くという方法もあります。
   </aside>
 </body>
 </html>

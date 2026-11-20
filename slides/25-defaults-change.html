@@ -53,13 +53,14 @@
     .opts b { color: var(--color-muted); font-weight: 700; }
     .opts code { color: var(--color-ink); }
     .opts .d { color: var(--color-muted); }
+    .opts .next { display: inline-block; margin-top: 20px; }
   </style>
 </head>
 <body class="slide">
   <h1>最新動向を追い続ける</h1>
   <div class="cols">
-    <section class="col"><h2>手口は増え続ける</h2><p>インストール時だけでなく、import 時(node-ipc)やフォルダを開いた時(keyv)にも動く</p></section>
-    <section class="col"><h2>新しい対策も増える</h2><p class="opts"><code>trustPolicy</code><br><span class="d">公開経路の信頼度が下がったバージョンを弾く</span><br><code>blockExoticSubdeps</code><br><span class="d">推移的依存の URL・Git 指定を弾く</span></p></section>
+    <section class="col"><h2>手口は増え続ける</h2><p>今までも攻撃の手口は進化・多様化してきた。未知の攻撃手法の出現に向けて、定常的に備えておく必要がある。</p></section>
+    <section class="col"><h2>新しい対策も増える</h2><p class="opts"><code>trustPolicy</code><br><span class="d">公開経路の信頼度が下がったバージョンを弾く</span><br><code class="next">blockExoticSubdeps</code><br><span class="d">推移的依存の URL・Git 指定を弾く</span></p></section>
     <section class="col"><h2>対策の不備も見つかる</h2><p>pnpm の Minimum Release Age は、lockfile を約4か月検査していなかった</p></section>
   </div>
   <aside class="notes">
