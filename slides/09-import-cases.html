@@ -48,7 +48,7 @@
   <div class="rows">
     <div class="row"><b><a href="https://snyk.io/blog/malicious-node-ipc-versions-published-npm"><code>require('node-ipc')</code></a></b><p><code>~/.aws/credentials</code>, <code>~/.ssh</code>, GitHub Token などを盗む</p></div>
     <div class="row"><b><a href="https://www.microsoft.com/en-us/security/blog/2026/07/15/unpacking-asyncapi-npm-supply-chain-compromise-import-time-payload-delivery/"><code>import '@asyncapi/specs'</code></a></b><p>PC を外から遠隔操作できるマルウェアを仕込む</p></div>
-    <div class="row"><b><a href="https://www.aikido.dev/blog/npm-debug-and-chalk-packages-compromised"><code>import 'chalk'</code></a></b><p>Browser にて仮想通貨の送金先を書き換える</p></div>
+    <div class="row"><b><a href="https://www.aikido.dev/blog/npm-debug-and-chalk-packages-compromised"><code>import 'chalk'</code></a></b><p>Browser からの仮想通貨の送金先を書き換える</p></div>
   </div>
   <aside class="notes">実際に、 postinstall ではなく実行時を狙った攻撃がありました。例えば node-ipc では require しただけで 機微情報が盗まれたり、 AsyncAPI では外部から PC が遠隔操作されるマルウェアが仕込まれました。 chalk や debug では import すると仮想通貨ウォレットの送金先を書き換えるようになっていました。</aside>
 </body>
