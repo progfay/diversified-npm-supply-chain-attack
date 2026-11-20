@@ -26,22 +26,16 @@
     .slide p { margin: 0; text-wrap: pretty; }
     .slide code { font-family: var(--font-mono); }
     .slide strong { color: var(--color-accent); }
-    .timeline {
+    .flow {
       display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 0;
-      position: relative;
-      margin-top: 8px;
+      grid-template-columns: 300px 170px 1fr;
+      align-items: center;
+      gap: 16px;
     }
-    .timeline::before {
-      content: '';
-      position: absolute;
-      left: 0; right: 0; top: 30px;
-      border-top: 3px solid var(--color-line);
-    }
-    .phase { position: relative; padding: 0 24px 0 0; display: flex; flex-direction: column; gap: 12px; }
-    .phase .cmd {
-      position: relative;
+    .branch { width: 170px; height: 240px; display: block; }
+    .branch line { stroke: var(--color-muted); stroke-width: 3; }
+    .branch polygon { fill: var(--color-muted); }
+    .cmd {
       align-self: flex-start;
       font-family: var(--font-mono);
       font-size: var(--text-h2);
@@ -49,32 +43,44 @@
       border-radius: 8px;
       background: var(--color-surface);
       border: 2px solid var(--color-line);
+      white-space: nowrap;
     }
-    .phase .what { color: var(--color-muted); }
-    .phase .result { font-size: var(--text-h2); font-weight: 700; }
-    .ok .result { color: var(--color-success); }
-    .ng .result { color: var(--color-danger); }
-    .ng .cmd { border-color: var(--color-danger); }
-    .ex { font-size: var(--text-muted); color: var(--color-muted); }
-    .ex b { color: var(--color-ink); font-weight: 700; }
-    .lead { font-size: var(--text-body); }
+    .col { display: flex; flex-direction: column; gap: 12px; }
+    .cmds { display: flex; flex-direction: column; gap: 28px; }
+    .cmds .cmd { border-color: var(--color-danger); }
+    .what { color: var(--color-muted); font-size: var(--text-muted); white-space: nowrap; }
+    .result { font-size: var(--text-h2); font-weight: 700; }
+    .ok { color: var(--color-success); }
+    .ng { color: var(--color-danger); }
+    .right { display: grid; grid-template-columns: auto 1fr; gap: 24px; align-items: center; }
+    .ex { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; font-size: var(--text-muted); color: var(--color-muted); }
+    .ex b { color: var(--color-ink); }
   </style>
 </head>
 <body class="slide">
   <h1>postinstall を止めても、コードは入る</h1>
-  <div class="timeline">
-    <section class="phase ok">
+  <div class="flow">
+    <div class="col">
       <span class="cmd">npm install</span>
-      <p class="what">preinstall / postinstall が実行</p>
-      <p class="result">✅ ブロックできる</p>
-    </section>
-    <section class="phase ng">
-      <span class="cmd">npm start</span>
-      <p class="what"><code>import "compromised-pkg"</code></p>
-      <p class="result">❌ 止められない</p>
-      <p class="ex"><b>node-ipc(2026年5月)</b>: <code>require</code> しただけで、クラウドの鍵・SSH 鍵・GitHub のトークンなどを盗む</p>
-      <p class="ex"><b>AsyncAPI(2026年7月)</b>: 読み込むと、PC を外から遠隔操作できるマルウェアを仕込む</p>
-    </section>
+      <p class="what">preinstall / postinstall</p>
+      <p class="result ok">✅ ブロックできる</p>
+    </div>
+    <svg class="branch" viewBox="0 0 170 240" aria-hidden="true"><line x1="8" y1="120" x2="148" y2="40"/><polygon points="154.9,36.0 145.0,50.9 137.1,37.0"/><line x1="8" y1="120" x2="148" y2="120"/><polygon points="156.0,120.0 140.0,128.0 140.0,112.0"/><line x1="8" y1="120" x2="148" y2="200"/><polygon points="154.9,204.0 137.1,203.0 145.0,189.1"/></svg>
+    <div class="right">
+      <div class="cmds">
+        <span class="cmd">npm start</span>
+        <span class="cmd">npm test</span>
+        <span class="cmd">npm run lint</span>
+      </div>
+      <div class="col">
+        <p class="what"><code>import "compromised-pkg"</code></p>
+        <p class="result ng">❌ 止められない</p>
+      </div>
+    </div>
+  </div>
+  <div class="ex">
+    <p><b>node-ipc</b>: <code>require</code> しただけで、クラウドの鍵・SSH 鍵・GitHub のトークンなどを盗む</p>
+    <p><b>AsyncAPI</b>: 読み込むと、PC を外から遠隔操作できるマルウェアを仕込む</p>
   </div>
   <aside class="notes">
     まず postinstall のブロックです。止められるのは、インストールのときに動くスクリプトだけです。でも、悪意あるコードは、パッケージを require や import した時点でも動かせます。1つめの例では、悪意あるバージョンを require しただけで、クラウドの鍵や SSH 鍵、GitHub のトークンなどが集められて、外に送られていました。2つめの例では、読み込むと、PC を外から遠隔操作できるマルウェアが仕込まれました。ブラウザに保存したパスワードや Cookie まで狙うものです。どちらも postinstall を使っていないので、ブロックしていても止まりません。
