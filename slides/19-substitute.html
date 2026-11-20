@@ -59,11 +59,11 @@
     </section>
     <section class="card">
       <h2>Runtime の機能を使う</h2>
-      <p class="ex">chalk → <code>util.styleText</code><br>uuid → <code>crypto.randomUUID</code><br>throttle → <code>util.throttle</code><br>debounce → <code>util.debounce</code></p>
+      <p class="ex">chalk → <code>util.styleText</code><br>uuid → <code>crypto.randomUUID</code><br>throttle → <code>util.throttle</code><br>rimraf → <code>fs.rmSync</code></p>
     </section>
   </div>
   <aside class="notes">
-    無理のない減らし方をいくつか挙げます。1つは、Runtime の機能を使うこと。chalk の代わりに util.styleText、uuid の代わりに crypto.randomUUID が使えますし、throttle や debounce も最近 util に入りました。次に、新しく足す前に、既存の依存で同じことができないかを確かめること。それから、同じ役割の依存が重複していないか。date-fns と dayjs、concurrently と npm-run-all2、chalk と picocolors のように、気付くと両方入っていることがあります。最後に、package.json に残っているだけで使われていない依存を、knip などで見つけて消すことです。どれも、信頼する相手を増やさずに、減らす方向に働きます。
+    無理のない減らし方をいくつか挙げます。1つは、Runtime の機能を使うこと。chalk の代わりに util.styleText、uuid の代わりに crypto.randomUUID が使えますし、throttle も最近 util に入りましたし、rimraf の代わりに fs.rmSync も使えます。次に、新しく足す前に、既存の依存で同じことができないかを確かめること。それから、同じ役割の依存が重複していないか。date-fns と dayjs、concurrently と npm-run-all2、chalk と picocolors のように、気付くと両方入っていることがあります。最後に、package.json に残っているだけで使われていない依存を、knip などで見つけて消すことです。どれも、信頼する相手を増やさずに、減らす方向に働きます。
   </aside>
 </body>
 </html>

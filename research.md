@@ -252,7 +252,7 @@ scripts なし + `binding.gyp` のみのパッケージ(gyp の `<!(...)` でマ
 |---|---|---|
 | chalk(文字に色をつける) | 🟢 `util.styleText()` | v21.7.0 / v20.12.0 で追加。v23.5.0 / v22.13.0 で stable。v26.1.0 で16進カラー対応 |
 | throttle / debounce 系 | 🟢 `util.throttle()` / `util.debounce()` | v26.10.0 で追加(⚠️ かなり新しい) |
-| rimraf(ディレクトリの再帰削除) | 🟢 `fs.rm(path, { recursive: true })` | v14.14.0 で追加 |
+| rimraf(ディレクトリの再帰削除) | 🟢 `fs.rm(path, { recursive: true })` / `fs.rmSync()` | どちらも v14.14.0 で追加 |
 | uuid | 🟢 `crypto.randomUUID()`(v7 は `crypto.randomUUIDv7()` もある) | v15.6.0 / v14.17.0 で追加 |
 
 - 注意: `util.throttle` / `util.debounce` は v26.10.0 からなので、LTS で使えるかは聴衆の環境次第。例に出すなら「最近入った」と添える

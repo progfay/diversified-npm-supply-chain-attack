@@ -26,25 +26,27 @@
     .slide p { margin: 0; text-wrap: pretty; }
     .slide code { font-family: var(--font-mono); }
     .slide strong { color: var(--color-accent); }
-    .rows { display: flex; flex-direction: column; gap: 24px; }
+    .rows { display: grid; grid-template-columns: auto 1fr; row-gap: 24px; }
     .row {
       display: grid;
-      grid-template-columns: 460px 1fr;
-      gap: 24px;
+      grid-column: 1 / -1;
+      grid-template-columns: subgrid;
+      column-gap: 28px;
       align-items: center;
-      padding: 28px 32px;
+      padding: 28px 28px;
       border-radius: 12px;
       background: var(--color-surface);
     }
     .row b { font-family: var(--font-mono); font-size: var(--text-body); }
     .row b a { color: var(--color-danger); text-decoration: none; }
     .row b small { display: block; font-family: var(--font-body); font-size: var(--text-muted); font-weight: 400; color: var(--color-muted); }
+    .row p { white-space: nowrap; }
   </style>
 </head>
 <body class="slide">
   <h1>読み込むだけで動いた事例</h1>
   <div class="rows">
-    <div class="row"><b><a href="https://snyk.io/blog/malicious-node-ipc-versions-published-npm"><code>require('node-ipc')</code></a></b><p>AWS などの認証情報・SSH 鍵・GitHub のトークンなどを盗む</p></div>
+    <div class="row"><b><a href="https://snyk.io/blog/malicious-node-ipc-versions-published-npm"><code>require('node-ipc')</code></a></b><p><code>~/.aws/credentials</code>、<code>~/.ssh</code>、GitHub Token などを盗む</p></div>
     <div class="row"><b><a href="https://www.microsoft.com/en-us/security/blog/2026/07/15/unpacking-asyncapi-npm-supply-chain-compromise-import-time-payload-delivery/"><code>import '@asyncapi/specs'</code></a></b><p>PC を外から遠隔操作できるマルウェアを仕込む</p></div>
   </div>
   <aside class="notes">
