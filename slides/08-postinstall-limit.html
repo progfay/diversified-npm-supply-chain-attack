@@ -27,56 +27,51 @@
     .slide code { font-family: var(--font-mono); }
     .slide strong { color: var(--color-accent); }
     .flow {
+      margin: auto;
       display: grid;
-      grid-template-columns: 300px 170px 1fr;
+      grid-template-columns: auto 172px auto;
+      grid-template-rows: 216px auto;
+      column-gap: 16px;
+      row-gap: 20px;
       align-items: center;
-      gap: 16px;
     }
-    .branch { width: 170px; height: 240px; display: block; }
+    .branch { width: 172px; height: 216px; display: block; }
     .branch line { stroke: var(--color-muted); stroke-width: 3; }
     .branch polygon { fill: var(--color-muted); }
     .cmd {
-      align-self: flex-start;
       font-family: var(--font-mono);
       font-size: var(--text-h2);
-      padding: 4px 20px;
+      height: 56px;
+      line-height: 48px;
+      padding: 0 20px;
       border-radius: 8px;
       background: var(--color-surface);
       border: 2px solid var(--color-line);
       white-space: nowrap;
+      justify-self: start;
     }
-    .col { display: flex; flex-direction: column; gap: 12px; }
-    .cmds { display: flex; flex-direction: column; gap: 28px; }
+    .cmds { display: flex; flex-direction: column; gap: 24px; align-items: flex-start; }
     .cmds .cmd { border-color: var(--color-danger); }
+    .note { display: flex; flex-direction: column; gap: 8px; align-self: start; }
     .what { color: var(--color-muted); font-size: var(--text-muted); white-space: nowrap; }
     .result { font-size: var(--text-h2); font-weight: 700; }
     .ok { color: var(--color-success); }
     .ng { color: var(--color-danger); }
-    .right { display: grid; grid-template-columns: auto 1fr; gap: 24px; align-items: center; }
-    .ex { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; font-size: var(--text-muted); color: var(--color-muted); }
-    .ex b { color: var(--color-ink); }
   </style>
 </head>
 <body class="slide">
   <h1>postinstall を止めても、コードは入る</h1>
   <div class="flow">
-    <div class="col">
-      <span class="cmd">npm install</span>
-      <p class="what">preinstall / postinstall</p>
-      <p class="result ok">✅ ブロックできる</p>
+    <span class="cmd">npm install</span>
+    <svg class="branch" viewBox="0 0 172 216" aria-hidden="true"><line x1="6" y1="108" x2="157.4" y2="32.3"/><polygon points="166,28 155.3,42.3 148.1,28.0"/><line x1="6" y1="108" x2="156.4" y2="108.0"/><polygon points="166,108 150.0,116.0 150.0,100.0"/><line x1="6" y1="108" x2="157.4" y2="183.7"/><polygon points="166,188 148.1,188.0 155.3,173.7"/></svg>
+    <div class="cmds">
+      <span class="cmd">npm start</span>
+      <span class="cmd">npm test</span>
+      <span class="cmd">npm run lint</span>
     </div>
-    <svg class="branch" viewBox="0 0 170 240" aria-hidden="true"><line x1="8" y1="120" x2="148" y2="40"/><polygon points="154.9,36.0 145.0,50.9 137.1,37.0"/><line x1="8" y1="120" x2="148" y2="120"/><polygon points="156.0,120.0 140.0,128.0 140.0,112.0"/><line x1="8" y1="120" x2="148" y2="200"/><polygon points="154.9,204.0 137.1,203.0 145.0,189.1"/></svg>
-    <div class="right">
-      <div class="cmds">
-        <span class="cmd">npm start</span>
-        <span class="cmd">npm test</span>
-        <span class="cmd">npm run lint</span>
-      </div>
-      <div class="col">
-        <p class="what"><code>import "compromised-pkg"</code></p>
-        <p class="result ng">❌ 止められない</p>
-      </div>
-    </div>
+    <div class="note"><p class="what">preinstall / postinstall</p><p class="result ok">✅ ブロックできる</p></div>
+    <span></span>
+    <div class="note"><p class="what"><code>import "compromised-pkg"</code></p><p class="result ng">❌ 止められない</p></div>
   </div>
   <aside class="notes">
     まず postinstall のブロックです。止められるのは、npm install のときに動く preinstall や postinstall のスクリプトだけです。でも、そのあと npm start や npm test、npm run lint を実行すると、パッケージが import されます。悪意あるコードは、この import の時点でも動かせます。ここは、postinstall をブロックしていても止められません。
