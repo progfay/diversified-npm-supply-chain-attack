@@ -195,16 +195,24 @@ html:active-view-transition-type(backward)::view-transition-new(current-slide) {
 /* --- 発表者ビュー(presentation mode) --- *
  * p キーで開くポップアップ(?mode=presenter)がこのレイアウトになる
  * (開いた側の opener は観客用として通常表示のまま)。
- * 左に現在のスライド、右上に次のスライド、右下に発表者ノート。
+ * バーの下、画面の上 6 割を 7:3 に分けて現在のスライドと次のスライド、
+ * 下 4 割を発表者ノートに使う。
  * スライドは #stage の host をそのまま置き直し、幅だけ与えて
  * base.css の cqw スケールで縮める(overview と同じ仕組み)。
  */
 
 body.presenter {
-  --p-top: 88px;
-  --p-gap: 24px;
-  --p-split: 62vw;
-  --p-next-w: calc(100vw - var(--p-split) - var(--p-gap) * 2);
+  --p-bar: 48px;
+  --p-gap: 20px;
+  --p-top: calc(var(--p-bar) + var(--p-gap));
+  /* 上 6 割のうちスライドに使える高さと幅 */
+  --p-h: calc(60dvb - var(--p-top) - var(--p-gap) / 2);
+  --p-w: calc(100dvi - var(--p-gap) * 3);
+  /* 横幅で 7:3 に分け、高さが足りなければ現在のスライドを縮める。
+     次のスライドは常に現在のスライドの 3/7 幅で、すぐ右隣に置く */
+  --p-cur-w: min(calc(var(--p-w) * 0.7), calc(var(--p-h) * 16 / 9));
+  --p-next-x: calc(var(--p-gap) * 2 + var(--p-cur-w));
+  --p-next-w: calc(var(--p-cur-w) * 3 / 7);
 }
 
 body.presenter #chrome { display: none; }
@@ -220,13 +228,12 @@ body.presenter:not(.overview) .slide-host {
 
 body.presenter:not(.overview) .slide-host[data-active] {
   left: var(--p-gap);
-  width: min(calc(var(--p-split) - var(--p-gap) * 1.5),
-             calc((100dvb - var(--p-top) - var(--p-gap)) * 16 / 9));
+  width: var(--p-cur-w);
 }
 
 body.presenter:not(.overview) .slide-host[data-next] {
   display: block;
-  left: calc(var(--p-split) + var(--p-gap) / 2);
+  left: var(--p-next-x);
   width: var(--p-next-w);
   opacity: 0.8;
 }
@@ -247,7 +254,7 @@ body.presenter:not(.overview) .slide-host[data-active] { view-transition-name: n
 #presenter-bar {
   position: absolute;
   inset: 0 0 auto 0;
-  height: 56px;
+  height: var(--p-bar);
   display: flex;
   align-items: center;
   gap: 24px;
@@ -258,7 +265,7 @@ body.presenter:not(.overview) .slide-host[data-active] { view-transition-name: n
 
 #presenter-timer {
   pointer-events: auto;
-  font: 700 28px/1 ui-monospace, monospace;
+  font: 700 26px/1 ui-monospace, monospace;
   color: #5CCFE6;
   background: none;
   border: 0;
@@ -267,7 +274,7 @@ body.presenter:not(.overview) .slide-host[data-active] { view-transition-name: n
 }
 
 #presenter-clock,
-#presenter-page { font: 20px/1 ui-monospace, monospace; }
+#presenter-page { font: 18px/1 ui-monospace, monospace; }
 
 #presenter-help {
   margin-left: auto;
@@ -275,38 +282,47 @@ body.presenter:not(.overview) .slide-host[data-active] { view-transition-name: n
   color: rgb(255 255 255 / 0.5);
 }
 
-#presenter-next-label,
-#presenter-end {
+/* 次のスライドの左上に重ねるラベル */
+#presenter-next-label {
   position: absolute;
-  left: calc(var(--p-split) + var(--p-gap) / 2);
-  font: 600 12px/1 ui-monospace, monospace;
+  left: var(--p-next-x);
+  top: var(--p-top);
+  z-index: 1;
+  padding: 4px 8px;
+  border-radius: 4px 0 4px 0;
+  background: rgb(0 0 0 / 0.6);
+  font: 600 11px/1 ui-monospace, monospace;
   letter-spacing: 0.1em;
-  color: rgb(255 255 255 / 0.5);
+  color: rgb(255 255 255 / 0.75);
 }
 
-#presenter-next-label { top: calc(var(--p-top) - 20px); }
-
 #presenter-end {
+  position: absolute;
+  left: var(--p-next-x);
   top: var(--p-top);
   width: var(--p-next-w);
   aspect-ratio: 16 / 9;
   display: grid;
   place-items: center;
-  font-size: 18px;
+  font-size: 15px;
+  color: rgb(255 255 255 / 0.5);
   border: 1px dashed rgb(255 255 255 / 0.2);
   border-radius: 4px;
 }
 
 #presenter-end[hidden] { display: none; }
 
+/* 下 4 割: 発表者ノート */
 #presenter-notes {
   position: absolute;
-  left: calc(var(--p-split) + var(--p-gap) / 2);
+  left: var(--p-gap);
   right: var(--p-gap);
-  top: calc(var(--p-top) + var(--p-next-w) * 9 / 16 + var(--p-gap));
+  top: calc(60dvb + var(--p-gap) / 2);
   bottom: var(--p-gap);
   overflow-y: auto;
   pointer-events: auto;
+  padding-top: var(--p-gap);
+  border-top: 1px solid rgb(255 255 255 / 0.12);
   font-size: var(--presenter-notes-size);
   line-height: 1.6;
 }
