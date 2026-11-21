@@ -193,7 +193,8 @@ html:active-view-transition-type(backward)::view-transition-new(current-slide) {
 }
 
 /* --- 発表者ビュー(presentation mode) --- *
- * p キーで opener 側がこのレイアウトになる(観客用は別ウィンドウで通常表示)。
+ * p キーで開くポップアップ(?mode=presenter)がこのレイアウトになる
+ * (開いた側の opener は観客用として通常表示のまま)。
  * 左に現在のスライド、右上に次のスライド、右下に発表者ノート。
  * スライドは #stage の host をそのまま置き直し、幅だけ与えて
  * base.css の cqw スケールで縮める(overview と同じ仕組み)。
@@ -267,8 +268,6 @@ body.presenter:not(.overview) .slide-host[data-active] { view-transition-name: n
 
 #presenter-clock,
 #presenter-page { font: 20px/1 ui-monospace, monospace; }
-
-#presenter-warning { color: #FFB454; font-size: 14px; }
 
 #presenter-help {
   margin-left: auto;

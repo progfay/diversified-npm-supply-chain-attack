@@ -11,7 +11,8 @@ const state = {
                    //   file: string, loaded: Promise<void>|null }
   current: -1,
   overview: false,
-  presenter: false, // 発表者ビュー(p キー)。観客用ウィンドウと同期する
+  presenter: false, // 発表者ビュー(p キーで開くポップアップ側)
+  audience: false,  // 発表者ビューを開いた側(観客用)。発表者ビューと同期する
 };
 
 const $ = (sel) => document.querySelector(sel);
@@ -26,8 +27,11 @@ async function boot() {
   setupNavigation();
   setupPresenterSync();
 
-  // 発表者ビューのままリロードした場合(?mode=presenter)は発表者ビューで復帰する
-  if (new URL(location.href).searchParams.get('mode') === 'presenter') enterPresenter({ openAudience: false });
+  // ?mode=presenter はポップアップの発表者ビュー、?mode=audience はそれを開いた
+  // 観客用ウィンドウ(リロードしても役割を保つ)
+  const mode = new URL(location.href).searchParams.get('mode');
+  if (mode === 'presenter') enterPresenter();
+  else if (mode === 'audience') state.audience = true;
 
   // 初期ページ: URL (?page=3) があればそこへ、なければ先頭へ
   goTo(pageFromURL(new URL(location.href)) ?? 0, { replace: true });
@@ -267,8 +271,9 @@ function setupNavigation() {
         toggleOverview();
         break;
       case 'p':
-        // 観客用ウィンドウ自身は発表者ビューにならない
-        if (!isAudience) togglePresenter();
+        // 発表者ビューでは p でポップアップを閉じる。それ以外では開く
+        if (state.presenter) window.close();
+        else openPresenter();
         break;
       case '+':
       case '=':
@@ -336,23 +341,21 @@ function toggleOverview() {
 /* ---------------------------------------------------------------- *
  * 発表者ビュー(presentation mode)
  *
- * p キーで、このウィンドウ(opener)を発表者ビューに切り替え、観客用の
- * ウィンドウを window.open で開く。発表者ビューには現在のスライド・
- * 次のスライド・発表者ノート・経過タイマーを出す。
- * ページ送りは BroadcastChannel で双方向に同期する(どちらで送っても
- * もう一方が追従する)。チャネルに参加するのは発表者ビューと観客用
- * ウィンドウだけで、普通に開いた他のタブは巻き込まない。
+ * p キーで、発表者ビューをポップアップで開く(?mode=presenter)。
+ * 開いた側(opener)はそのまま観客用の上映画面になる(?mode=audience)。
+ * 発表者ビューには現在のスライド・次のスライド・発表者ノート・経過
+ * タイマーを出す。ページ送りは BroadcastChannel で双方向に同期する
+ * (どちらで送ってももう一方が追従する)。チャネルに参加するのは
+ * この2つのウィンドウだけで、普通に開いた他のタブは巻き込まない。
  * ---------------------------------------------------------------- */
 
-const AUDIENCE_NAME = 'slidex-audience';
-// window.name はリロードしても残るので、観客用ウィンドウの判定に使う
-const isAudience = window.name === AUDIENCE_NAME;
+const PRESENTER_NAME = 'slidex-presenter';
 const channel = new BroadcastChannel(`slidex:${location.pathname}`);
 let syncedPage = -1; // 最後に送受信したページ(受信→送信のループ防止)
 const NOTES_SIZE_KEY = 'slidex:presenter-notes-size';
 
 function syncing() {
-  return isAudience || state.presenter;
+  return state.audience || state.presenter;
 }
 
 function syncPage(n) {
@@ -368,54 +371,40 @@ function setupPresenterSync() {
     if (msg?.type === 'goto' && Number.isInteger(msg.page)) {
       syncedPage = msg.page;
       goTo(msg.page, { replace: true });
-    } else if (msg?.type === 'hello' && state.presenter && state.current >= 0) {
-      // 観客用ウィンドウが(再)読み込みされたら現在ページを教える
+    } else if (msg?.type === 'hello' && state.current >= 0) {
+      // 相手が(再)読み込みされたら現在ページを教える
       channel.postMessage({ type: 'goto', page: state.current });
     }
   });
-  if (isAudience) channel.postMessage({ type: 'hello' });
+  // 観客用ウィンドウがリロードされた時は、発表者ビューのページに合わせる
+  if (state.audience) channel.postMessage({ type: 'hello' });
 }
 
-function togglePresenter() {
-  if (state.presenter) exitPresenter();
-  else enterPresenter({ openAudience: true });
+// 発表者ビューをポップアップで開き、このウィンドウを観客用にする
+function openPresenter() {
+  const url = new URL(location.href);
+  url.searchParams.set('mode', 'presenter');
+  if (state.current >= 0) url.searchParams.set('page', state.current + 1);
+  // 同名のウィンドウが既にあれば、それを再利用(再読み込み)する
+  const win = window.open(url.href, PRESENTER_NAME, 'popup,width=1280,height=800');
+  if (win === null) {
+    alert('発表者ビューを開けませんでした。ポップアップを許可してから、もう一度 p を押してください。');
+    return;
+  }
+  state.audience = true;
+  setModeParam('audience');
+  syncedPage = state.current;
 }
 
-function enterPresenter({ openAudience }) {
+function enterPresenter() {
   state.presenter = true;
-  state.overview = false;
   document.body.classList.add('presenter');
   $('#presenter').hidden = false;
-  setModeParam('presenter');
   startTimer();
   applyNotesSize(loadNotesSize());
-
-  if (openAudience) {
-    const url = new URL(location.href);
-    url.searchParams.delete('mode');
-    if (state.current >= 0) url.searchParams.set('page', state.current + 1);
-    // 同名のウィンドウが既にあれば、それを再利用(再読み込み)する
-    const win = window.open(url.href, AUDIENCE_NAME, 'popup,width=1280,height=720');
-    $('#presenter-warning').hidden = win !== null;
-  }
-  if (state.current >= 0) {
-    syncedPage = -1;
-    syncPage(state.current);
-    render();
-  }
 }
 
-function exitPresenter() {
-  state.presenter = false;
-  document.body.classList.remove('presenter');
-  $('#presenter').hidden = true;
-  setModeParam(null);
-  stopTimer();
-  state.slides.forEach((s) => s.host.removeAttribute('data-next'));
-  render();
-}
-
-// ?mode=presenter を履歴を増やさずに付け外しする(goTo の urlFor が引き継ぐ)
+// ?mode= を履歴を増やさずに付け替える(goTo の urlFor が引き継ぐ)
 function setModeParam(mode) {
   const url = new URL(location.href);
   if (mode) url.searchParams.set('mode', mode);
@@ -467,11 +456,6 @@ function startTimer() {
   };
   tick();
   timerId = setInterval(tick, 1000);
-}
-
-function stopTimer() {
-  clearInterval(timerId);
-  timerId = 0;
 }
 
 // ノートの文字サイズ(+ / - で調整、ブラウザに記憶)
