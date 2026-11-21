@@ -11,6 +11,7 @@ const state = {
                    //   file: string, loaded: Promise<void>|null }
   current: -1,
   overview: false,
+  presenter: false, // 発表者ビュー(p キー)。観客用ウィンドウと同期する
 };
 
 const $ = (sel) => document.querySelector(sel);
@@ -23,6 +24,10 @@ async function boot() {
   await loadDeckFromManifest();
 
   setupNavigation();
+  setupPresenterSync();
+
+  // 発表者ビューのままリロードした場合(?mode=presenter)は発表者ビューで復帰する
+  if (new URL(location.href).searchParams.get('mode') === 'presenter') enterPresenter({ openAudience: false });
 
   // 初期ページ: URL (?page=3) があればそこへ、なければ先頭へ
   goTo(pageFromURL(new URL(location.href)) ?? 0, { replace: true });
@@ -187,6 +192,7 @@ async function transitionTo(n) {
   // state は同期的に確定させる(ロード完了まで遅らせると、連打時に
   // 次の入力が古い state.current を見て取りこぼす)
   state.current = n;
+  syncPage(n);
   try {
     await ensureSlide(n);
   } catch (err) {
@@ -195,7 +201,9 @@ async function transitionTo(n) {
   // ロード待ちの間に別ページへ移っていたら描画しない(後発の呼び出しに任せる)
   if (state.current !== n) return;
 
-  if (from === -1 || from === n || matchMedia('(prefers-reduced-motion: reduce)').matches) {
+  // 発表者ビューは2枚(現在+次)を同時に出すので遷移演出をかけない
+  if (from === -1 || from === n || state.presenter ||
+      matchMedia('(prefers-reduced-motion: reduce)').matches) {
     render();
   } else {
     const vt = document.startViewTransition({ update: render, types: [n > from ? 'forward' : 'backward'] });
@@ -218,6 +226,7 @@ function render() {
   $('#progress').style.transform =
     `scaleX(${state.slides.length > 1 ? state.current / (state.slides.length - 1) : 1})`;
   document.body.classList.toggle('overview', state.overview);
+  if (state.presenter) renderPresenter();
 }
 
 function setupNavigation() {
@@ -256,6 +265,15 @@ function setupNavigation() {
         break;
       case 'o':
         toggleOverview();
+        break;
+      case 'p':
+        // 観客用ウィンドウ自身は発表者ビューにならない
+        if (!isAudience) togglePresenter();
+        break;
+      case '+':
+      case '=':
+      case '-':
+        if (state.presenter) resizeNotes(e.key === '-' ? -2 : 2);
         break;
     }
   });
@@ -313,6 +331,168 @@ function toggleOverview() {
     for (let i = 0; i < state.slides.length; i++) ensureSlide(i).catch(() => {});
   }
   render();
+}
+
+/* ---------------------------------------------------------------- *
+ * 発表者ビュー(presentation mode)
+ *
+ * p キーで、このウィンドウ(opener)を発表者ビューに切り替え、観客用の
+ * ウィンドウを window.open で開く。発表者ビューには現在のスライド・
+ * 次のスライド・発表者ノート・経過タイマーを出す。
+ * ページ送りは BroadcastChannel で双方向に同期する(どちらで送っても
+ * もう一方が追従する)。チャネルに参加するのは発表者ビューと観客用
+ * ウィンドウだけで、普通に開いた他のタブは巻き込まない。
+ * ---------------------------------------------------------------- */
+
+const AUDIENCE_NAME = 'slidex-audience';
+// window.name はリロードしても残るので、観客用ウィンドウの判定に使う
+const isAudience = window.name === AUDIENCE_NAME;
+const channel = new BroadcastChannel(`slidex:${location.pathname}`);
+let syncedPage = -1; // 最後に送受信したページ(受信→送信のループ防止)
+const NOTES_SIZE_KEY = 'slidex:presenter-notes-size';
+
+function syncing() {
+  return isAudience || state.presenter;
+}
+
+function syncPage(n) {
+  if (!syncing() || n === syncedPage) return;
+  syncedPage = n;
+  channel.postMessage({ type: 'goto', page: n });
+}
+
+function setupPresenterSync() {
+  channel.addEventListener('message', (e) => {
+    if (!syncing()) return;
+    const msg = e.data;
+    if (msg?.type === 'goto' && Number.isInteger(msg.page)) {
+      syncedPage = msg.page;
+      goTo(msg.page, { replace: true });
+    } else if (msg?.type === 'hello' && state.presenter && state.current >= 0) {
+      // 観客用ウィンドウが(再)読み込みされたら現在ページを教える
+      channel.postMessage({ type: 'goto', page: state.current });
+    }
+  });
+  if (isAudience) channel.postMessage({ type: 'hello' });
+}
+
+function togglePresenter() {
+  if (state.presenter) exitPresenter();
+  else enterPresenter({ openAudience: true });
+}
+
+function enterPresenter({ openAudience }) {
+  state.presenter = true;
+  state.overview = false;
+  document.body.classList.add('presenter');
+  $('#presenter').hidden = false;
+  setModeParam('presenter');
+  startTimer();
+  applyNotesSize(loadNotesSize());
+
+  if (openAudience) {
+    const url = new URL(location.href);
+    url.searchParams.delete('mode');
+    if (state.current >= 0) url.searchParams.set('page', state.current + 1);
+    // 同名のウィンドウが既にあれば、それを再利用(再読み込み)する
+    const win = window.open(url.href, AUDIENCE_NAME, 'popup,width=1280,height=720');
+    $('#presenter-warning').hidden = win !== null;
+  }
+  if (state.current >= 0) {
+    syncedPage = -1;
+    syncPage(state.current);
+    render();
+  }
+}
+
+function exitPresenter() {
+  state.presenter = false;
+  document.body.classList.remove('presenter');
+  $('#presenter').hidden = true;
+  setModeParam(null);
+  stopTimer();
+  state.slides.forEach((s) => s.host.removeAttribute('data-next'));
+  render();
+}
+
+// ?mode=presenter を履歴を増やさずに付け外しする(goTo の urlFor が引き継ぐ)
+function setModeParam(mode) {
+  const url = new URL(location.href);
+  if (mode) url.searchParams.set('mode', mode);
+  else url.searchParams.delete('mode');
+  if (url.href !== location.href) history.replaceState(history.state, '', url.href);
+}
+
+function renderPresenter() {
+  const total = state.slides.length;
+  const n = state.current;
+  state.slides.forEach((s, i) => s.host.toggleAttribute('data-next', i === n + 1));
+  $('#presenter-page').textContent = `${n + 1} / ${total}`;
+  $('#presenter-end').hidden = n + 1 < total;
+
+  const notesEl = $('#presenter-notes');
+  const aside = state.slides[n]?.shadow.querySelector('aside.notes');
+  notesEl.replaceChildren();
+  if (aside && aside.textContent.trim()) {
+    notesEl.append(...[...aside.childNodes].map((c) => c.cloneNode(true)));
+    // 子要素のない素のテキストのノートは改行をそのまま活かす
+    notesEl.classList.toggle('plain', aside.children.length === 0);
+  } else {
+    const empty = document.createElement('p');
+    empty.className = 'presenter-empty';
+    empty.textContent = state.slides[n]?.loaded ? 'ノートなし' : '読み込み中…';
+    notesEl.append(empty);
+  }
+  notesEl.scrollTop = 0;
+}
+
+// 経過タイマー(クリックでリセット)と現在時刻
+let timerStarted = 0;
+let timerId = 0;
+
+function startTimer() {
+  if (timerId) return;
+  timerStarted = Date.now();
+  const timer = $('#presenter-timer');
+  timer.onclick = () => {
+    timerStarted = Date.now();
+    tick();
+  };
+  const pad = (v) => String(v).padStart(2, '0');
+  const tick = () => {
+    const sec = Math.floor((Date.now() - timerStarted) / 1000);
+    timer.textContent = `${pad(Math.floor(sec / 60))}:${pad(sec % 60)}`;
+    const now = new Date();
+    $('#presenter-clock').textContent = `${pad(now.getHours())}:${pad(now.getMinutes())}`;
+  };
+  tick();
+  timerId = setInterval(tick, 1000);
+}
+
+function stopTimer() {
+  clearInterval(timerId);
+  timerId = 0;
+}
+
+// ノートの文字サイズ(+ / - で調整、ブラウザに記憶)
+function loadNotesSize() {
+  try {
+    const v = Number(localStorage.getItem(NOTES_SIZE_KEY));
+    if (v >= 12 && v <= 64) return v;
+  } catch {}
+  return 24;
+}
+
+function applyNotesSize(px) {
+  $('#presenter').style.setProperty('--presenter-notes-size', `${px}px`);
+}
+
+function resizeNotes(delta) {
+  const px = clamp(loadNotesSize() + delta, 12, 64);
+  try {
+    localStorage.setItem(NOTES_SIZE_KEY, String(px));
+  } catch {}
+  applyNotesSize(px);
 }
 
 /* ---------------------------------------------------------------- *

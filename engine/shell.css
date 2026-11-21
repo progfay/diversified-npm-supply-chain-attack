@@ -191,3 +191,134 @@ html:active-view-transition-type(backward)::view-transition-new(current-slide) {
      (継承プロパティなので shadow 内のスライドにも効く) */
   :root { print-color-adjust: exact; }
 }
+
+/* --- 発表者ビュー(presentation mode) --- *
+ * p キーで opener 側がこのレイアウトになる(観客用は別ウィンドウで通常表示)。
+ * 左に現在のスライド、右上に次のスライド、右下に発表者ノート。
+ * スライドは #stage の host をそのまま置き直し、幅だけ与えて
+ * base.css の cqw スケールで縮める(overview と同じ仕組み)。
+ */
+
+body.presenter {
+  --p-top: 88px;
+  --p-gap: 24px;
+  --p-split: 62vw;
+  --p-next-w: calc(100vw - var(--p-split) - var(--p-gap) * 2);
+}
+
+body.presenter #chrome { display: none; }
+
+body.presenter:not(.overview) .slide-host {
+  top: var(--p-top);
+  transform: none;
+  height: auto;
+  aspect-ratio: 16 / 9;
+  overflow: hidden;
+  border-radius: 4px;
+}
+
+body.presenter:not(.overview) .slide-host[data-active] {
+  left: var(--p-gap);
+  width: min(calc(var(--p-split) - var(--p-gap) * 1.5),
+             calc((100dvb - var(--p-top) - var(--p-gap)) * 16 / 9));
+}
+
+body.presenter:not(.overview) .slide-host[data-next] {
+  display: block;
+  left: calc(var(--p-split) + var(--p-gap) / 2);
+  width: var(--p-next-w);
+  opacity: 0.8;
+}
+
+body.presenter:not(.overview) .slide-host[data-active] { view-transition-name: none; }
+
+#presenter {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  color: #E8EDF6;
+  font-family: system-ui, 'Hiragino Kaku Gothic ProN', sans-serif;
+  --presenter-notes-size: 24px;
+}
+
+#presenter[hidden] { display: none; }
+
+#presenter-bar {
+  position: absolute;
+  inset: 0 0 auto 0;
+  height: 56px;
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  padding: 0 var(--p-gap);
+  background: rgb(255 255 255 / 0.05);
+  font-variant-numeric: tabular-nums;
+}
+
+#presenter-timer {
+  pointer-events: auto;
+  font: 700 28px/1 ui-monospace, monospace;
+  color: #5CCFE6;
+  background: none;
+  border: 0;
+  padding: 0;
+  cursor: pointer;
+}
+
+#presenter-clock,
+#presenter-page { font: 20px/1 ui-monospace, monospace; }
+
+#presenter-warning { color: #FFB454; font-size: 14px; }
+
+#presenter-help {
+  margin-left: auto;
+  font-size: 13px;
+  color: rgb(255 255 255 / 0.5);
+}
+
+#presenter-next-label,
+#presenter-end {
+  position: absolute;
+  left: calc(var(--p-split) + var(--p-gap) / 2);
+  font: 600 12px/1 ui-monospace, monospace;
+  letter-spacing: 0.1em;
+  color: rgb(255 255 255 / 0.5);
+}
+
+#presenter-next-label { top: calc(var(--p-top) - 20px); }
+
+#presenter-end {
+  top: var(--p-top);
+  width: var(--p-next-w);
+  aspect-ratio: 16 / 9;
+  display: grid;
+  place-items: center;
+  font-size: 18px;
+  border: 1px dashed rgb(255 255 255 / 0.2);
+  border-radius: 4px;
+}
+
+#presenter-end[hidden] { display: none; }
+
+#presenter-notes {
+  position: absolute;
+  left: calc(var(--p-split) + var(--p-gap) / 2);
+  right: var(--p-gap);
+  top: calc(var(--p-top) + var(--p-next-w) * 9 / 16 + var(--p-gap));
+  bottom: var(--p-gap);
+  overflow-y: auto;
+  pointer-events: auto;
+  font-size: var(--presenter-notes-size);
+  line-height: 1.6;
+}
+
+#presenter-notes.plain { white-space: pre-line; }
+#presenter-notes p { margin: 0 0 0.8em; }
+#presenter-notes .presenter-empty { color: rgb(255 255 255 / 0.4); font-style: italic; }
+
+/* overview 中・印刷時は発表者ビューを畳む */
+body.presenter.overview #presenter { display: none; }
+
+@media print {
+  #presenter { display: none !important; }
+}
